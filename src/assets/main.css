@@ -1,0 +1,13 @@
+@import './base.css';
+
+* {
+  font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+}
+
+#app {
+}
