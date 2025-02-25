@@ -1,3 +1,5 @@
+@import './varible.scss';
+
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
   --main-purple: #635fc7;
@@ -46,16 +48,16 @@
   letter-spacing: 2.4px;
 }
 
-.text-medium {
-  font-weight: normal;
-  font-size: 13px;
-  line-height: 23px;
+.body-l {
+  @extend %body-l;
 }
 
-.text-bold {
-  font-weight: bold;
-  font-size: 12px;
-  line-height: 15px;
+.body-m {
+  @extend %body-m;
+}
+
+.opacity-25 {
+  @extend %opacity-25;
 }
 
 button {

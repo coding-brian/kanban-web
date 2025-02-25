@@ -1,7 +1,7 @@
 <script lang="ts" setup></script>
 
 <template>
-  <button class="text-medium"><slot></slot></button>
+  <button class="body-l"><slot></slot></button>
 </template>
 
 <style lang="scss" scoped>
@@ -10,9 +10,8 @@ button {
   height: 40px;
   color: white;
   background-color: var(--main-purple);
-}
-
-button:hover {
-  background-color: var(--main-purple-hover);
+  &:hover {
+    background-color: var(--main-purple-hover);
+  }
 }
 </style>

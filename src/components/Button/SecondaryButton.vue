@@ -1,5 +1,5 @@
 <template>
-  <button class="text-medium"><slot></slot></button>
+  <button class="body-l"><slot></slot></button>
 </template>
 
 <style lang="scss" scoped>
@@ -8,9 +8,8 @@ button {
   height: 40px;
   color: var(--main-purple);
   background-color: rgba(99, 95, 199, 0.1);
-}
-
-button:hover {
-  background-color: rgba(99, 95, 199, 0.25);
+  &:hover {
+    background-color: rgba(99, 95, 199, 0.25);
+  }
 }
 </style>

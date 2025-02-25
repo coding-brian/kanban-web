@@ -1,3 +1,12 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import CustomInput from '@/components/CustomInput.vue'
+</script>
 
-<template><div>12</div></template>
+<template>
+  <div>
+    <CustomInput>
+      <template v-slot:title>title</template>
+      <template v-slot:error-message>error-message</template>
+    </CustomInput>
+  </div>
+</template>
