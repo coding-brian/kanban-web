@@ -4,6 +4,7 @@ import { ref } from 'vue'
 const props = defineProps({
   value: { type: String, default: null },
   placeholder: { type: String, default: null },
+  validate: { type: Function, default: null },
 })
 const emit = defineEmits(['update:value'])
 
@@ -14,6 +15,10 @@ const change = (e: Event) => {
   inputContainer.value.classList.remove('error')
   emit('update:value', target.value)
 }
+
+const validate = () => {
+  if (props.validate) props.validate()
+}
 </script>
 
 <template>
@@ -22,7 +27,13 @@ const change = (e: Event) => {
       <slot name="title"></slot>
     </span>
     <div class="input-wrapper">
-      <input type="text" :value="props.value" @input="change" :placeholder="props.placeholder" />
+      <input
+        type="text"
+        :value="props.value"
+        @input="change"
+        :placeholder="props.placeholder"
+        @blur="validate"
+      />
       <span class="error-message"><slot name="error-message"></slot></span>
     </div>
   </div>
