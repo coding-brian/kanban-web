@@ -1,4 +1,4 @@
-@import './varible.scss';
+@use './varible' as *;
 
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
@@ -6,7 +6,7 @@
   --main-purple-hover: #a8a4ff;
   --dark-grey: #2b2c37;
   --dark-lines: #3e3f4e;
-  --light-grey: #f4f7fd;
+  // --light-grey: #f4f7fd;
   --rich-black: #000112;
   --medium-grey: #828fa3;
   --fire-opal: #ea5555;

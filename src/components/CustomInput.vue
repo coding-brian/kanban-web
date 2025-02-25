@@ -50,7 +50,7 @@ const validate = () => {
 
   input {
     width: 100%;
-    border: 1px rgba($color: $--medium-grey, $alpha: 0.25) solid;
+    border: 1px rgba($color: $medium-grey, $alpha: 0.25) solid;
     border-radius: 4px;
     outline: none;
   }
@@ -58,7 +58,7 @@ const validate = () => {
   .title {
     font-size: 12px;
     font-weight: bold;
-    color: $--medium-grey;
+    color: $medium-grey;
   }
 
   &::placeholder {
@@ -77,7 +77,7 @@ const validate = () => {
     position: relative;
 
     input {
-      border-color: $--fire-opal;
+      border-color: $fire-opal;
     }
   }
 
@@ -86,7 +86,7 @@ const validate = () => {
     position: absolute;
     right: 16px;
     top: 0px;
-    color: $--fire-opal;
+    color: $fire-opal;
   }
 }
 </style>
