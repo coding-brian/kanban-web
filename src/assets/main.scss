@@ -10,6 +10,13 @@ body {
   box-sizing: border-box;
 }
 
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none; /* 移除項目符號 */
+}
+
 #app {
   min-height: 100vh;
 }
