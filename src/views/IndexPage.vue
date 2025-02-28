@@ -3,6 +3,7 @@ import { ref, type Ref } from 'vue'
 import DrowndownComponent from '@/components/DrowndownComponent.vue'
 import { type IOption } from '@/interfaces/Option'
 import CardComponent from '@/components/CardComponent.vue'
+import MaskComponent from '@/components/MaskComponent.vue'
 
 // const options: Ref<Array<IOption>> = ref([
 //   { id: '1', name: '4', value: '11' },
