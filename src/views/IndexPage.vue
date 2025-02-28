@@ -1,21 +1,205 @@
 <script lang="ts" setup>
 import { ref, type Ref } from 'vue'
-import DrowndownComponent from '@/components/DrowndownComponent.vue'
-import { type IOption } from '@/interfaces/Option'
-import CardComponent from '@/components/CardComponent.vue'
-import PopupComponent from '@/components/PopupComponent.vue'
+import LogoImage from '@/components/Image/LogoImage.vue'
+import { type IBoard } from '@/interfaces/IBoard'
+import DarkImage from '@/components/Image/DarkImage.vue'
+import LightImage from '@/components/Image/LightImage.vue'
+import ToggleCompnent from '@/components/ToggleComponent.vue'
+import HideSidebarImage from '@/components/Image/HideSidebarImage.vue'
 
-// const options: Ref<Array<IOption>> = ref([
-//   { id: '1', name: '4', value: '11' },
-//   { id: '2', name: '2', value: '22' },
-// ])
-// const value: Ref<string> = ref('')
+const boards: Ref<Array<IBoard>> = ref([
+  {
+    id: '0',
+    isActive: false,
+    imageSrc: '/icon-board.svg',
+    name: '',
+  },
+  { id: '1', isActive: true, imageSrc: '/icon-board.svg', name: '' },
+])
+
+const enter = (board: IBoard): void => {
+  if (!board.isActive) {
+    board.imageSrc = '/icon-purple-board.svg'
+  }
+}
+
+const leave = (board: IBoard): void => {
+  if (!board.isActive) {
+    board.imageSrc = '/icon-board.svg'
+  }
+}
+
+const click = (board: IBoard): void => {
+  boards.value.forEach((item) => {
+    if (item.id === board.id) {
+      item.isActive = true
+      item.imageSrc = '/icon-white-board.svg'
+    } else {
+      item.isActive = false
+      item.imageSrc = '/icon-board.svg'
+    }
+  })
+
+  // TODO 要去拿選到的 board 的資料
+}
 </script>
 
 <template>
-  <PopupComponent> </PopupComponent>
-  <div>
-    <!-- <DrowndownComponent v-model:value="value" :options="options"></DrowndownComponent> -->
-    <CardComponent></CardComponent>
-  </div>
+  <header>123</header>
+  <aside>
+    <div class="logo">
+      <LogoImage />
+    </div>
+    <nav>
+      <span class="nav-title">ALL BOARDS (3)</span>
+      <ul>
+        <li
+          class="item"
+          :class="{ active: board.isActive }"
+          v-for="board in boards"
+          @mouseenter="enter(board)"
+          @mouseleave="leave(board)"
+          @click="click(board)"
+          :key="board.id"
+        >
+          <img :src="board.imageSrc" alt="" srcset="" />
+          <span class="item-title">456</span>
+        </li>
+        <li>
+          <img src="/icon-purple-board.svg" alt="" srcset="" />
+          <span class="item-title">+ Create New Board</span>
+        </li>
+      </ul>
+    </nav>
+    <div class="aside-footer">
+      <div class="mode-toggle">
+        <LightImage />
+        <ToggleCompnent />
+        <DarkImage />
+      </div>
+      <div class="hide-sidebar">
+        <HideSidebarImage />
+        <span>Hide Sidebar</span>
+      </div>
+    </div>
+  </aside>
+  <main>798</main>
 </template>
+
+<style lang="scss" scoped>
+header {
+  border: 1px $light-lines solid;
+  grid-area: header;
+}
+
+aside {
+  border: 1px $light-lines solid;
+  grid-area: aside;
+  display: flex;
+  flex-direction: column;
+  padding-top: 32px;
+  padding-bottom: 32px;
+
+  .aside-footer {
+    margin-left: 32px;
+    margin-right: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+
+main {
+  border: 1px $light-lines solid;
+  grid-area: main;
+  background-color: $light-grey;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 54px;
+  margin-left: 32px;
+}
+
+nav {
+  flex: 1;
+
+  .nav-title {
+    display: block;
+    font-size: 12px;
+    font-weight: blod;
+    letter-spacing: 2.4px;
+    color: $medium-grey;
+    padding-left: 32px;
+    margin-bottom: 16px;
+  }
+
+  li {
+    cursor: pointer;
+    width: 240px;
+    height: 48px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding-left: 32px;
+
+    .item-title {
+      @extend %heading-m;
+      color: $main-purple;
+    }
+
+    &.item {
+      .item-title {
+        @extend %heading-m;
+        color: $medium-grey;
+      }
+
+      &:hover {
+        background-color: rgba($color: $main-purple, $alpha: 0.1);
+        border-top-right-radius: 100px;
+        border-bottom-right-radius: 100px;
+        .item-title {
+          @extend %heading-m;
+          color: $main-purple;
+        }
+      }
+
+      &.active {
+        background-color: $main-purple;
+        border-top-right-radius: 100px;
+        border-bottom-right-radius: 100px;
+
+        .item-title {
+          @extend %heading-m;
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+.mode-toggle {
+  border-radius: 6px;
+  background-color: $light-grey;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+
+  img {
+    object-fit: contain;
+  }
+}
+
+.hide-sidebar {
+  display: flex;
+  gap: 8px;
+
+  span {
+    @extend %heading-m;
+    color: $medium-grey;
+  }
+}
+</style>
