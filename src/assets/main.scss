@@ -18,12 +18,10 @@ li {
 }
 
 #app {
-  min-height: 100vh;
-  height: 100%;
-  width: 100%;
+  height: 100vh;
   display: grid;
-  grid-template-columns: 300px 1fr;
-  grid-template-rows: 97px 1fr;
+  grid-template-columns: 300px auto;
+  grid-template-rows: 97px auto;
   grid-template-areas:
     'aside header'
     'aside main';

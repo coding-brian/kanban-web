@@ -83,7 +83,7 @@ const click = (board: IBoard): void => {
       </div>
     </div>
   </aside>
-  <main>798</main>
+  <main>456</main>
 </template>
 
 <style lang="scss" scoped>
@@ -113,6 +113,12 @@ main {
   border: 1px $light-lines solid;
   grid-area: main;
   background-color: $light-grey;
+  overflow: auto;
+  display: flex;
+
+  & > * {
+    flex-shrink: 0;
+  }
 }
 
 .logo {
