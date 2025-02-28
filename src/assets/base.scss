@@ -33,9 +33,7 @@
 }
 
 .heading-m {
-  font-weight: bold;
-  font-size: 15px;
-  line-height: 19px;
+  @extend %heading-m;
 }
 
 .heading-s {
