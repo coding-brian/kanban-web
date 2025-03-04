@@ -1,61 +1,89 @@
 <script lang="ts" setup>
-import { ref, type Ref } from 'vue'
+import { computed, onMounted, ref, type Ref } from 'vue'
 import LogoImage from '@/components/Image/LogoImage.vue'
 import { type IBoard } from '@/interfaces/IBoard'
 import DarkImage from '@/components/Image/DarkImage.vue'
 import LightImage from '@/components/Image/LightImage.vue'
 import ToggleCompnent from '@/components/ToggleComponent.vue'
 import HideSidebarImage from '@/components/Image/HideSidebarImage.vue'
+import { getBoardAsync, getBoardByIdAsync } from '@/apis/kanbanapi.ts'
+import PrimaryLButton from '@/components/button/PrimaryLButton.vue'
+import EellipsisImage from '@/components/Image/EellipsisImage.vue'
 
-const boards: Ref<Array<IBoard>> = ref([
-  {
-    id: '0',
-    isActive: false,
-    imageSrc: '/icon-board.svg',
-    name: '',
-  },
-  { id: '1', isActive: true, imageSrc: '/icon-board.svg', name: '' },
-])
+const boards: Ref<Array<IBoard>> = ref([])
+
+const board: Ref<IBoard | null> = ref(null)
+
+const hasColumns = computed(
+  () => board.value && board.value.columns && board.value.columns.length > 0,
+)
 
 const enter = (board: IBoard): void => {
-  if (!board.isActive) {
+  if (!board.isSelected) {
     board.imageSrc = '/icon-purple-board.svg'
   }
 }
 
 const leave = (board: IBoard): void => {
-  if (!board.isActive) {
+  if (!board.isSelected) {
     board.imageSrc = '/icon-board.svg'
   }
 }
 
-const click = (board: IBoard): void => {
+const click = async (selectedBoard: IBoard): Promise<void> => {
   boards.value.forEach((item) => {
-    if (item.id === board.id) {
-      item.isActive = true
+    if (item.id === selectedBoard.id) {
+      item.isSelected = true
       item.imageSrc = '/icon-white-board.svg'
     } else {
-      item.isActive = false
+      item.isSelected = false
       item.imageSrc = '/icon-board.svg'
     }
   })
 
-  // TODO 要去拿選到的 board 的資料
+  board.value = await getBoardByIdAsync(selectedBoard.id)
 }
+
+const init = async (): Promise<void> => {
+  boards.value = await getBoardAsync()
+  boards.value.forEach((item, index) => {
+    if (index === 0) {
+      item.imageSrc = '/icon-white-board.svg'
+      item.isSelected = true
+      board.value = item
+    } else {
+      item.imageSrc = '/icon-board.svg'
+      item.isSelected = false
+    }
+  })
+}
+
+onMounted(async () => await init())
 </script>
 
 <template>
-  <header>123</header>
+  <header>
+    <span class="heading-xl">{{ board?.name }}</span>
+    <div>
+      <PrimaryLButton
+        :class="{ 'opacity-25': hasColumns ? false : true }"
+        :disabled="hasColumns ? false : true"
+      >
+        <span>+ Add New Task</span>
+      </PrimaryLButton>
+      <EellipsisImage></EellipsisImage>
+    </div>
+  </header>
   <aside>
     <div class="logo">
       <LogoImage />
     </div>
     <nav>
-      <span class="nav-title">ALL BOARDS (3)</span>
+      <span class="nav-title">ALL BOARDS ({{ boards.length }})</span>
       <ul>
         <li
           class="item"
-          :class="{ active: board.isActive }"
+          :class="{ active: board.isSelected }"
           v-for="board in boards"
           @mouseenter="enter(board)"
           @mouseleave="leave(board)"
@@ -63,9 +91,9 @@ const click = (board: IBoard): void => {
           :key="board.id"
         >
           <img :src="board.imageSrc" alt="" srcset="" />
-          <span class="item-title">456</span>
+          <span class="item-title">{{ board.name }}</span>
         </li>
-        <li>
+        <li class="item">
           <img src="/icon-purple-board.svg" alt="" srcset="" />
           <span class="item-title">+ Create New Board</span>
         </li>
@@ -90,6 +118,24 @@ const click = (board: IBoard): void => {
 header {
   border: 1px $light-lines solid;
   grid-area: header;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 24px;
+  padding-right: 24px;
+
+  & > span {
+    cursor: default;
+  }
+
+  & > div {
+    display: flex;
+    gap: 24px;
+
+    & > img {
+      object-fit: contain;
+    }
+  }
 }
 
 aside {
@@ -150,15 +196,13 @@ nav {
     align-items: center;
     padding-left: 32px;
 
-    .item-title {
-      @extend %heading-m;
-      color: $main-purple;
-    }
-
     &.item {
       .item-title {
         @extend %heading-m;
         color: $medium-grey;
+        white-space: nowrap; /* 文字不換行 */
+        overflow: hidden; /* 隱藏超出部分 */
+        text-overflow: ellipsis; /* 顯示省略號 */
       }
 
       &:hover {

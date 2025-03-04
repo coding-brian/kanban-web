@@ -1,6 +1,9 @@
+import type { IColumn } from './IColumn'
+
 export interface IBoard {
   id: string
   name: string
-  isActive: boolean
+  isSelected: boolean
   imageSrc: string
+  columns: IColumn[]
 }

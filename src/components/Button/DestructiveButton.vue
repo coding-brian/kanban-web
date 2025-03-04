@@ -8,7 +8,9 @@ button {
   height: 40px;
   color: white;
   background-color: var(--fire-opal);
-  &:hover {
+  cursor: pointer;
+
+  &:not(:disabled):hover {
     background-color: var(--american-pink);
   }
 }

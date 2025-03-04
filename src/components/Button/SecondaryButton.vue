@@ -6,9 +6,11 @@
 button {
   border-radius: 20px;
   height: 40px;
-  color: var($main-purple);
+  color: $main-purple;
   background-color: rgba(99, 95, 199, 0.1);
-  &:hover {
+  cursor: pointer;
+
+  &:not(:disabled):hover {
     background-color: rgba(99, 95, 199, 0.25);
   }
 }

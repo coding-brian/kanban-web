@@ -9,9 +9,11 @@ button {
   border-radius: 20px;
   height: 40px;
   color: white;
-  background-color: var($main-purple);
-  &:hover {
-    background-color: var($main-purple-hover);
+  background-color: $main-purple;
+  cursor: pointer;
+
+  &:not(:disabled):hover {
+    background-color: $main-purple-hover;
   }
 }
 </style>
