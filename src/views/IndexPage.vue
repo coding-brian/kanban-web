@@ -209,6 +209,8 @@ main {
     background: linear-gradient(to bottom, #e9effa 100%, #e9effa 50%);
     padding-left: 55px;
     padding-right: 55px;
+    cursor: pointer;
+
     span {
       color: $medium-grey;
     }
