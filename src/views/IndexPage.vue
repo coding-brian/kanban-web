@@ -6,18 +6,62 @@ import DarkImage from '@/components/Image/DarkImage.vue'
 import LightImage from '@/components/Image/LightImage.vue'
 import ToggleCompnent from '@/components/ToggleComponent.vue'
 import HideSidebarImage from '@/components/Image/HideSidebarImage.vue'
-import { getBoardAsync, getBoardByIdAsync } from '@/apis/kanbanapi.ts'
-import PrimaryLButton from '@/components/button/PrimaryLButton.vue'
+import { getBoardAsync, getBoardByIdAsync, createTaskAsync } from '@/apis/kanbanapi.ts'
+import { debounce } from 'lodash-es'
+import PrimaryLButton from '@/components/Button/PrimaryLButton.vue'
+import PrimarySButton from '@/components/Button/PrimarySButton.vue'
 import EellipsisImage from '@/components/Image/EellipsisImage.vue'
 import CardComponent from '@/components/CardComponent.vue'
+import PopupComponent from '@/components/PopupComponent.vue'
+import CustomInput from '@/components/CustomInput.vue'
+import CrossImage from '@/components/Image/CrossImage.vue'
+import SecondaryButton from '@/components/Button/SecondaryButton.vue'
+import DrowndownComponent from '@/components/DrowndownComponent.vue'
+import type { IOption } from '@/interfaces/IOption'
+import type { ICreateTask } from '@/interfaces/task/ICreateTask'
 
 const boards: Ref<Array<IBoard>> = ref([])
 
 const board: Ref<IBoard | null> = ref(null)
 
+const taskCreation: Ref<ICreateTask> = ref({
+  boardId: '',
+  title: '',
+  description: '',
+  columnId: '',
+  subTasks: [],
+})
+
+const isShowCreateTaks: Ref<boolean> = ref(false)
+
 const hasColumns = computed(
   () => board.value && board.value.columns && board.value.columns.length > 0,
 )
+
+const options = computed(() => {
+  const result: Array<IOption> = []
+  if (!board.value) {
+    return result
+  }
+  board.value.columns.forEach((item) => {
+    result.push({ id: item.id, name: item.name, value: item.id })
+  })
+  return result
+})
+
+const createTask = debounce(async () => {
+  try {
+    taskCreation.value.boardId = board.value!.id
+    await createTaskAsync(taskCreation.value)
+    isShowCreateTaks.value = false
+  } catch (error) {
+    console.error(error)
+  }
+}, 500)
+
+const addSubTask = () => taskCreation.value.subTasks.push({ title: '' })
+
+const removeSubTask = (index: number) => taskCreation.value.subTasks.splice(index, 1)
 
 const enter = (board: IBoard): void => {
   if (!board.isSelected) {
@@ -59,6 +103,10 @@ const init = async (): Promise<void> => {
   })
 }
 
+const hidePopup = () => {
+  isShowCreateTaks.value = false
+}
+
 onMounted(async () => await init())
 </script>
 
@@ -69,6 +117,7 @@ onMounted(async () => await init())
       <PrimaryLButton
         :class="{ 'opacity-25': hasColumns ? false : true }"
         :disabled="hasColumns ? false : true"
+        @click="isShowCreateTaks = true"
       >
         <span>+ Add New Task</span>
       </PrimaryLButton>
@@ -124,18 +173,63 @@ onMounted(async () => await init())
 
     <template v-if="hasColumns">
       <div class="column" v-for="column in board?.columns" :key="column.id">
-        <span class="heading-s">{{ column.name }} ({{ board?.columns.length }})</span>
-        <div>
-          <CardComponent>
-            <template v-slot:title>66666</template>
-          </CardComponent>
-        </div>
+        <span class="heading-s">{{ column.name }} ({{ column.tasks.length }})</span>
+        <CardComponent v-for="task in column.tasks" :key="task.id">
+          <template v-slot:title>{{ task.title }}</template>
+          <template v-slot:completed-substasks>{{
+            task.subTasks.filter((item) => item.isActive).length
+          }}</template>
+          <template v-slot:totle-substasks>{{ task.subTasks.length }}</template>
+        </CardComponent>
       </div>
       <div class="add-new-column">
         <span class="heading-xl">+ New Column</span>
       </div>
     </template>
   </main>
+  <PopupComponent v-if="isShowCreateTaks" @click="hidePopup">
+    <div class="add-new-task-container" @click.stop>
+      <span class="heading-l black"> Add New Task</span>
+      <CustomInput :placeholder="'e.g Take coffee break'" v-model:value="taskCreation.title">
+        <template v-slot:title>
+          <span>Title</span>
+        </template>
+      </CustomInput>
+      <CustomInput
+        class="description"
+        v-model:value="taskCreation.description"
+        :isTextarea="true"
+        :placeholder="'e.g. It’s always good to take a break. This 15 minute break will recharge the batteries a little.'"
+      >
+        <template v-slot:title>
+          <span>Description</span>
+        </template>
+      </CustomInput>
+      <div class="add-new-subtask-container">
+        <span class="body-m medium-grey">SubTasks</span>
+        <div class="subtask">
+          <div class="subtask-item" v-for="(subTask, index) in taskCreation.subTasks" :key="index">
+            <CustomInput v-model:value="subTask.title"> </CustomInput>
+            <CrossImage @click="removeSubTask(index)" />
+          </div>
+          <SecondaryButton @click="addSubTask">
+            <span class="add-new-subtask-button-name">+ Add New Subtask</span>
+          </SecondaryButton>
+        </div>
+      </div>
+      <div class="column-select-container">
+        <span class="body-m medium-grey">Status</span>
+        <DrowndownComponent
+          :options="options"
+          v-model:value="taskCreation.columnId"
+        ></DrowndownComponent>
+      </div>
+
+      <PrimarySButton @click="createTask">
+        <span>Create Task</span>
+      </PrimarySButton>
+    </div>
+  </PopupComponent>
 </template>
 
 <style lang="scss" scoped>
@@ -220,6 +314,8 @@ main {
     display: flex;
     gap: 24px;
     flex-direction: column;
+    width: 280px;
+
     span {
       color: $medium-grey;
     }
@@ -314,5 +410,55 @@ nav {
     @extend %heading-m;
     color: $medium-grey;
   }
+}
+
+.add-new-task-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
+  min-width: 480px;
+
+  img {
+    cursor: pointer;
+  }
+
+  .description {
+    input {
+      height: 1000px;
+    }
+  }
+
+  .add-new-subtask-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .subtask {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .subtask-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        & > :first-child {
+          flex-grow: 1;
+        }
+      }
+
+      .add-new-subtask-button-name {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.column-select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 </style>

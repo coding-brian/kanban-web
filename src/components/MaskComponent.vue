@@ -7,8 +7,7 @@
 <style lang="scss" scoped>
 .mask {
   position: absolute;
-  background-color: black;
-  opacity: 50%;
+  background-color: rgba($color: #000000, $alpha: 0.5);
   height: 100vh;
   width: 100%;
 }

@@ -21,10 +21,30 @@ $light-lines: #e4ebfa;
   line-height: 15px;
 }
 
+%body-s {
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 19px;
+  letter-spacing: 2.4px;
+}
+
+%heading-s {
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 15px;
+  letter-spacing: 2.4px;
+}
+
 %heading-m {
   font-weight: bold;
   font-size: 15px;
   line-height: 19px;
+}
+
+%heading-l {
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 23px;
 }
 
 %heading-xl {

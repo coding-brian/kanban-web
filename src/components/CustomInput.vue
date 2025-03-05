@@ -5,6 +5,7 @@ const props = defineProps({
   value: { type: String, default: null },
   placeholder: { type: String, default: null },
   validate: { type: Function, default: null },
+  isTextarea: { type: Boolean, default: false },
 })
 const emit = defineEmits(['update:value'])
 
@@ -22,25 +23,38 @@ const validate = () => {
 </script>
 
 <template>
-  <div class="input-container" :ref="inputContainer">
+  <div class="container" ref="inputContainer">
     <span class="title">
       <slot name="title"></slot>
     </span>
-    <div class="input-wrapper">
-      <input
-        type="text"
-        :value="props.value"
-        @input="change"
-        :placeholder="props.placeholder"
-        @blur="validate"
-      />
+    <div class="wrapper">
+      <template v-if="props.isTextarea">
+        <textarea
+          class="area"
+          :value="props.value"
+          @input="change"
+          :placeholder="props.placeholder"
+          @blur="validate"
+        ></textarea>
+      </template>
+      <template v-else>
+        <input
+          class="area"
+          type="text"
+          :value="props.value"
+          @input="change"
+          :placeholder="props.placeholder"
+          @blur="validate"
+        />
+      </template>
+
       <span class="error-message"><slot name="error-message"></slot></span>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.input-container {
+.container {
   @extend %body-l;
 
   color: black;
@@ -48,17 +62,28 @@ const validate = () => {
   flex-direction: column;
   gap: 8px;
 
-  input {
+  .area {
     width: 100%;
     border: 1px rgba($color: $medium-grey, $alpha: 0.25) solid;
     border-radius: 4px;
     outline: none;
+    padding-left: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  textarea.area {
+    min-height: 112px;
   }
 
   .title {
     font-size: 12px;
     font-weight: bold;
     color: $medium-grey;
+  }
+
+  .title:empty {
+    display: none;
   }
 
   &::placeholder {
@@ -73,7 +98,7 @@ const validate = () => {
 }
 
 .error {
-  .input-wrapper {
+  .wrapper {
     position: relative;
 
     input {

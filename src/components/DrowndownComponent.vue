@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
-import { type IOption } from '@/interfaces/Option'
+import { nextTick, ref, watch, type Ref } from 'vue'
+import { type IOption } from '@/interfaces/IOption'
 
-defineProps<{
+const props = defineProps<{
   options: Array<IOption>
+  defaultOption?: IOption
 }>()
 
 const value = defineModel('value')
@@ -18,7 +19,9 @@ const choose = (option: IOption) => {
 }
 
 const blur = () => {
-  changeSelectStyle()
+  if (isOptionShow.value) {
+    changeSelectStyle()
+  }
 }
 
 const changeSelectStyle = () => {
@@ -29,6 +32,19 @@ const changeSelectStyle = () => {
     selectElement.value!.style.borderColor = 'rgba(130, 143, 163,0.25)'
   }
 }
+
+watch(
+  () => props.defaultOption,
+  (newValue) => {
+    if (newValue) {
+      nextTick(() => {
+        choose(newValue)
+        isOptionShow.value = false
+      })
+    }
+  },
+  { deep: true, immediate: true },
+)
 </script>
 
 <template>
@@ -40,7 +56,12 @@ const changeSelectStyle = () => {
     </div>
     <div class="option-group" v-if="isOptionShow">
       <ul>
-        <li class="option" @click.stop="choose(option)" v-for="option in options" :key="option.id">
+        <li
+          class="option"
+          @click.stop="choose(option)"
+          v-for="option in props.options"
+          :key="option.id"
+        >
           <span>{{ option.name }}</span>
         </li>
       </ul>
