@@ -9,6 +9,7 @@ import HideSidebarImage from '@/components/Image/HideSidebarImage.vue'
 import { getBoardAsync, getBoardByIdAsync } from '@/apis/kanbanapi.ts'
 import PrimaryLButton from '@/components/button/PrimaryLButton.vue'
 import EellipsisImage from '@/components/Image/EellipsisImage.vue'
+import CardComponent from '@/components/CardComponent.vue'
 
 const boards: Ref<Array<IBoard>> = ref([])
 
@@ -111,7 +112,30 @@ onMounted(async () => await init())
       </div>
     </div>
   </aside>
-  <main>456</main>
+  <main>
+    <template v-if="!hasColumns">
+      <div class="empty-container">
+        <span class="heading-l">This board is empty. Create a new column to get started.</span>
+        <PrimaryLButton>
+          <span>+ Add New Column</span>
+        </PrimaryLButton>
+      </div>
+    </template>
+
+    <template v-if="hasColumns">
+      <div class="column" v-for="column in board?.columns" :key="column.id">
+        <span class="heading-s">{{ column.name }} ({{ board?.columns.length }})</span>
+        <div>
+          <CardComponent>
+            <template v-slot:title>66666</template>
+          </CardComponent>
+        </div>
+      </div>
+      <div class="add-new-column">
+        <span class="heading-xl">+ New Column</span>
+      </div>
+    </template>
+  </main>
 </template>
 
 <style lang="scss" scoped>
@@ -161,6 +185,43 @@ main {
   background-color: $light-grey;
   overflow: auto;
   display: flex;
+  gap: 24px;
+  padding: 24px 0px 24px 24px;
+
+  .empty-container {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    color: $medium-grey;
+    flex-shrink: 1;
+  }
+
+  .add-new-column {
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to bottom, #e9effa 100%, #e9effa 50%);
+    padding-left: 55px;
+    padding-right: 55px;
+    span {
+      color: $medium-grey;
+    }
+  }
+
+  .column {
+    display: flex;
+    gap: 24px;
+    flex-direction: column;
+    span {
+      color: $medium-grey;
+    }
+  }
 
   & > * {
     flex-shrink: 0;

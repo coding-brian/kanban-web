@@ -12,6 +12,7 @@
 
 <style lang="scss" scoped>
 .card {
+  width: 280px;
   border-radius: 8px;
   box-shadow: 0px 4px 6px rgba(#364e7e, 0.1);
   display: flex;
@@ -20,6 +21,8 @@
   padding-left: 16px;
   padding-top: 24px;
   padding-bottom: 24px;
+  background-color: white;
+  cursor: pointer;
 
   .title {
     @extend %heading-m;
