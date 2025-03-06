@@ -12,3 +12,5 @@ export const getBoardByIdAsync = async (id: string): Promise<IBoard> =>
 
 export const createTaskAsync = async (param: ICreateTask): Promise<ITask> =>
   await request.post(`/task`, param)
+
+export const getTaskAsync = async (id: string): Promise<ITask> => await request.get(`/task/${id}`)

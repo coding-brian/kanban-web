@@ -6,6 +6,7 @@ const props = defineProps({
   isChecked: { type: Boolean, default: false },
   label: { type: [Number, String], default: null },
   placeholder: { type: String, default: null },
+  disable: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:value', 'update:isChecked'])
@@ -38,6 +39,7 @@ const change = (e: Event) => {
       :value="value"
       :placeholder="props.placeholder"
       :checked="props.isChecked"
+      :disabled="props.disable"
       @input="change"
     />
     <label :for="value?.toString()">{{ props.label }}</label>
@@ -46,7 +48,6 @@ const change = (e: Event) => {
 
 <style lang="scss" scoped>
 .input-container {
-  cursor: pointer;
   width: 100%;
   background-color: $light-grey;
   display: flex;
@@ -56,12 +57,16 @@ const change = (e: Event) => {
   padding-bottom: 16px;
   border-radius: 4px;
 
-  &:has(input:not(:checked)):hover {
+  &:has(input:not(:disabled)),
+  &:has(input:not(:disabled)) > * {
+    cursor: pointer;
+  }
+
+  &:has(input:not(:disabled)):has(input:not(:checked)):hover {
     background-color: rgba($color: $main-purple, $alpha: 0.25);
   }
 
   input {
-    cursor: pointer;
     appearance: none;
     width: 16px;
     height: 16px;
@@ -93,7 +98,6 @@ const change = (e: Event) => {
   }
 
   label {
-    cursor: pointer;
     font-size: 12px;
     font-weight: bold;
     margin-left: 16px;

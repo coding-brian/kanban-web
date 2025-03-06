@@ -16,9 +16,12 @@ import PopupComponent from '@/components/PopupComponent.vue'
 import CustomInput from '@/components/CustomInput.vue'
 import CrossImage from '@/components/Image/CrossImage.vue'
 import SecondaryButton from '@/components/Button/SecondaryButton.vue'
-import DrowndownComponent from '@/components/DrowndownComponent.vue'
+import DropdownComponent from '@/components/DropdownComponent.vue'
 import type { IOption } from '@/interfaces/IOption'
 import type { ICreateTask } from '@/interfaces/task/ICreateTask'
+import ViewComponent from '@/components/Task/ViewComponent.vue'
+import type { IColumn } from '@/interfaces/IColumn'
+import type { ITask } from '@/interfaces/ITask'
 
 const boards: Ref<Array<IBoard>> = ref([])
 
@@ -33,6 +36,12 @@ const taskCreation: Ref<ICreateTask> = ref({
 })
 
 const isShowCreateTaks: Ref<boolean> = ref(false)
+
+const isShowTask: Ref<boolean> = ref(false)
+
+const selectedTaskId: Ref<string> = ref('')
+
+const selectedColumn: Ref<IColumn | null> = ref(null)
 
 const hasColumns = computed(
   () => board.value && board.value.columns && board.value.columns.length > 0,
@@ -105,6 +114,21 @@ const init = async (): Promise<void> => {
 
 const hidePopup = () => {
   isShowCreateTaks.value = false
+  isShowTask.value = false
+}
+
+const openTask = (task: ITask) => {
+  isShowTask.value = true
+  selectedTaskId.value = task.id
+
+  if (board.value) {
+    for (const column of board.value.columns) {
+      if (column.id === task.columnId) {
+        selectedColumn.value = column
+        break
+      }
+    }
+  }
 }
 
 onMounted(async () => await init())
@@ -174,10 +198,10 @@ onMounted(async () => await init())
     <template v-if="hasColumns">
       <div class="column" v-for="column in board?.columns" :key="column.id">
         <span class="heading-s">{{ column.name }} ({{ column.tasks.length }})</span>
-        <CardComponent v-for="task in column.tasks" :key="task.id">
+        <CardComponent v-for="task in column.tasks" :key="task.id" @click="openTask(task)">
           <template v-slot:title>{{ task.title }}</template>
           <template v-slot:completed-substasks>{{
-            task.subTasks.filter((item) => item.isActive).length
+            task.subTasks.filter((item) => item.isCompleted).length
           }}</template>
           <template v-slot:totle-substasks>{{ task.subTasks.length }}</template>
         </CardComponent>
@@ -217,19 +241,21 @@ onMounted(async () => await init())
           </SecondaryButton>
         </div>
       </div>
-      <div class="column-select-container">
-        <span class="body-m medium-grey">Status</span>
-        <DrowndownComponent
-          :options="options"
-          v-model:value="taskCreation.columnId"
-        ></DrowndownComponent>
-      </div>
+      <DropdownComponent :options="options" v-model:value="taskCreation.columnId">
+        <template v-slot:title>Status</template>
+      </DropdownComponent>
 
       <PrimarySButton @click="createTask">
         <span>Create Task</span>
       </PrimarySButton>
     </div>
   </PopupComponent>
+  <ViewComponent
+    v-if="isShowTask"
+    :task-id="selectedTaskId"
+    :column="selectedColumn!"
+    @click="hidePopup"
+  ></ViewComponent>
 </template>
 
 <style lang="scss" scoped>
@@ -454,11 +480,5 @@ nav {
       }
     }
   }
-}
-
-.column-select-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 </style>

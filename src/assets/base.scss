@@ -7,7 +7,6 @@
   --dark-grey: #2b2c37;
   --dark-lines: #3e3f4e;
   --rich-black: #000112;
-  --fire-opal: #ea5555;
   --very-dark-grey: #20212c;
   --american-pink: #ff9898;
 }
@@ -50,6 +49,10 @@
 
 .medium-grey {
   color: $medium-grey;
+}
+
+.fire-opal {
+  color: $fire-opal;
 }
 
 button {
