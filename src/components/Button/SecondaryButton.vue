@@ -1,5 +1,7 @@
 <template>
-  <button class="body-l"><slot></slot></button>
+  <button class="body-l">
+    <span><slot></slot></span>
+  </button>
 </template>
 
 <style lang="scss" scoped>
@@ -12,6 +14,13 @@ button {
 
   &:not(:disabled):hover {
     background-color: rgba(99, 95, 199, 0.25);
+  }
+
+  span {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 23px;
+    color: $main-purple;
   }
 }
 </style>

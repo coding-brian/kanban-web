@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watch, ref, type Ref, computed, nextTick } from 'vue'
 import PopupComponent from '../PopupComponent.vue'
-import { getTaskAsync } from '@/apis/kanbanapi'
+import { getTaskAsync, deleteTaskAsync } from '@/apis/kanbanapi'
 import type { ITask } from '@/interfaces/ITask'
 import CheckBox from '../CheckBox.vue'
 import DropdownComponent from '@/components/DropdownComponent.vue'
@@ -9,26 +9,38 @@ import type { IColumn } from '@/interfaces/IColumn'
 import type { IOption } from '@/interfaces/IOption'
 import EellipsisImage from '@/components/Image/EellipsisImage.vue'
 import TransparentMask from '../TransparentMask.vue'
+import SecondaryButton from '../Button/SecondaryButton.vue'
+import DestructiveButton from '../Button/DestructiveButton.vue'
 
-const props = defineProps<{ taskId: string; column: IColumn }>()
+const props = defineProps<{
+  taskId: string
+  column: IColumn | null
+}>()
+
+const isShow = defineModel('isShow')
 
 const task: Ref<ITask | null> = ref<ITask | null>(null)
 
 const isShowTooltip: Ref<boolean> = ref(false)
 
+const isShowAlert: Ref<boolean> = ref(false)
+
 const tooltip: Ref<HTMLInputElement | undefined> = ref(undefined)
 
 const ellipsis = ref<{ element: HTMLElement } | null>(null)
 
-const options = computed(
-  (): Array<IOption> => [
-    {
-      id: props.column.id,
-      name: props.column.name,
-      value: props.column.id,
-    },
-  ],
-)
+const options = computed((): Array<IOption> => {
+  if (props.column) {
+    return [
+      {
+        id: props.column.id,
+        name: props.column.name,
+        value: props.column.id,
+      },
+    ]
+  }
+  return []
+})
 
 const openToolTip = () => {
   isShowTooltip.value = !isShowTooltip.value
@@ -39,7 +51,6 @@ const openToolTip = () => {
         tooltip.value.style.left = `${ellipsisInfo.right}px`
         tooltip.value.style.top = `${ellipsisInfo.top}px`
         tooltip.value.style.transform = 'translate(-50%,50%)'
-        console.log(tooltip.value.style.transform)
       }
     })
   }
@@ -47,6 +58,25 @@ const openToolTip = () => {
 
 const hideTooltip = () => {
   isShowTooltip.value = !isShowTooltip.value
+}
+
+const openAlert = () => {
+  isShowAlert.value = true
+  isShowTooltip.value = false
+}
+
+const deleteTask = async () => {
+  try {
+    await deleteTaskAsync(props.taskId)
+    isShowAlert.value = false
+    isShow.value = false
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const hide = () => {
+  isShow.value = false
 }
 
 watch(
@@ -62,7 +92,7 @@ watch(
 </script>
 
 <template>
-  <div class="view-container">
+  <div class="view-container" v-if="isShow" @click.stop="hide">
     <PopupComponent v-if="task">
       <div class="container" @click.stop>
         <div class="title-container">
@@ -100,10 +130,23 @@ watch(
       <div class="tooltip" ref="tooltip" @click.stop>
         <ul class="content">
           <li><span class="body-l medium-grey">Edit Task</span></li>
-          <li><span class="body-l fire-opal">Delete Task</span></li>
+          <li @click="openAlert"><span class="body-l fire-opal">Delete Task</span></li>
         </ul>
       </div>
     </TransparentMask>
+    <PopupComponent v-if="isShowAlert" @click.stop="isShowAlert = false">
+      <div class="alert-container">
+        <span class="fire-opal heading-l">Delete this task?</span>
+        <span class="body-l medium-grey"
+          >Are you sure you want to delete the {{ task?.title }} task? This action will remove all
+          subtasks and cannot be reversed.</span
+        >
+        <div class="button-group">
+          <DestructiveButton @click="deleteTask"> Delete </DestructiveButton>
+          <SecondaryButton @click="isShowAlert = false"> Cancel </SecondaryButton>
+        </div>
+      </div>
+    </PopupComponent>
   </div>
 </template>
 
@@ -160,5 +203,22 @@ watch(
   top: 0;
   width: 100%;
   height: 100%;
+}
+
+.alert-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
+  width: 480px;
+}
+
+.button-group {
+  display: flex;
+  gap: 16px;
+
+  & > button {
+    flex-grow: 1;
+  }
 }
 </style>

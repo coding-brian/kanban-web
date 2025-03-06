@@ -236,9 +236,7 @@ onMounted(async () => await init())
             <CustomInput v-model:value="subTask.title"> </CustomInput>
             <CrossImage @click="removeSubTask(index)" />
           </div>
-          <SecondaryButton @click="addSubTask">
-            <span class="add-new-subtask-button-name">+ Add New Subtask</span>
-          </SecondaryButton>
+          <SecondaryButton @click="addSubTask"> + Add New Subtask </SecondaryButton>
         </div>
       </div>
       <DropdownComponent :options="options" v-model:value="taskCreation.columnId">
@@ -251,10 +249,9 @@ onMounted(async () => await init())
     </div>
   </PopupComponent>
   <ViewComponent
-    v-if="isShowTask"
+    v-model:is-show="isShowTask"
     :task-id="selectedTaskId"
-    :column="selectedColumn!"
-    @click="hidePopup"
+    :column="selectedColumn"
   ></ViewComponent>
 </template>
 
