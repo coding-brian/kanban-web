@@ -11,11 +11,14 @@ import EellipsisImage from '@/components/Image/EellipsisImage.vue'
 import TransparentMask from '../TransparentMask.vue'
 import SecondaryButton from '../Button/SecondaryButton.vue'
 import DestructiveButton from '../Button/DestructiveButton.vue'
+import { debounce } from 'lodash-es'
 
 const props = defineProps<{
   taskId: string
   column: IColumn | null
 }>()
+
+const emit = defineEmits(['refresh'])
 
 const isShow = defineModel('isShow')
 
@@ -65,15 +68,16 @@ const openAlert = () => {
   isShowTooltip.value = false
 }
 
-const deleteTask = async () => {
+const deleteTask = debounce(async () => {
   try {
     await deleteTaskAsync(props.taskId)
     isShowAlert.value = false
     isShow.value = false
+    emit('refresh')
   } catch (e) {
     console.error(e)
   }
-}
+}, 500)
 
 const hide = () => {
   isShow.value = false

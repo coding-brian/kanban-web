@@ -63,6 +63,7 @@ const createTask = debounce(async () => {
     taskCreation.value.boardId = board.value!.id
     await createTaskAsync(taskCreation.value)
     isShowCreateTaks.value = false
+    await refresh()
   } catch (error) {
     console.error(error)
   }
@@ -110,6 +111,12 @@ const init = async (): Promise<void> => {
       item.isSelected = false
     }
   })
+}
+
+const refresh = async (): Promise<void> => {
+  if (board.value) {
+    board.value = await getBoardByIdAsync(board.value.id)
+  }
 }
 
 const hidePopup = () => {
@@ -252,6 +259,7 @@ onMounted(async () => await init())
     v-model:is-show="isShowTask"
     :task-id="selectedTaskId"
     :column="selectedColumn"
+    @refresh="refresh"
   ></ViewComponent>
 </template>
 
