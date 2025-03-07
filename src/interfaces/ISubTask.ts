@@ -1,5 +1,5 @@
 export interface ISubTask {
-  id: string | null
+  id: string
   taskId: string
   title: string
   isCompleted: boolean

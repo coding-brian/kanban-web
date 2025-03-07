@@ -9,6 +9,7 @@ import CrossImage from '@/components/Image/CrossImage.vue'
 import SecondaryButton from '@/components/Button/SecondaryButton.vue'
 import DropdownComponent from '@/components/DropdownComponent.vue'
 import PrimarySButton from '@/components/Button/PrimarySButton.vue'
+import type { IUpdateSubTask } from '@/interfaces/subtask/IUpdateSubTask'
 
 const props = defineProps<{ columns: IColumn[] | undefined; buttonFunction: () => object }>()
 
@@ -45,7 +46,11 @@ const defaultOption = computed((): IOption | undefined => {
 const removeSubTask = (index: number, task: ITask) => task.subTasks.splice(index, 1)
 
 const addSubTask = (task: ITask) =>
-  task.subTasks.push({ id: null, taskId: task.id, title: '', isCompleted: false })
+  (task.subTasks as IUpdateSubTask[]).push({
+    id: null,
+    taskId: task.id,
+    title: '',
+  })
 </script>
 
 <template>

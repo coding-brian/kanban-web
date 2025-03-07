@@ -13,6 +13,7 @@ import SecondaryButton from '../Button/SecondaryButton.vue'
 import DestructiveButton from '../Button/DestructiveButton.vue'
 import { debounce } from 'lodash-es'
 import FormComponent from './FormComponent.vue'
+import type { ISubTask } from '@/interfaces/ISubTask'
 
 const props = defineProps<{
   taskId: string
@@ -137,15 +138,15 @@ watch(
         <span class="body-l medium-grey">{{ task.description }}</span>
         <div class="subtask-container">
           <span class="body-m medium-grey">
-            Subtasks ({{ task.subTasks.filter((item) => item.isCompleted).length }}) of
-            {{ task.subTasks.length }}</span
+            Subtasks ({{ (task.subTasks as ISubTask[]).filter((item) => item.isCompleted).length }})
+            of {{ task.subTasks.length }}</span
           >
           <div class="item-wrapper">
             <CheckBox
               v-for="subTask in task.subTasks"
               :key="subTask.id!"
               :label="subTask.title"
-              :is-checked="subTask.isCompleted"
+              :is-checked="(subTask as ISubTask).isCompleted"
               :value="subTask.id!"
               :disable="true"
             ></CheckBox>
