@@ -1,4 +1,5 @@
 import type { ISubTask } from './ISubTask'
+import type { IUpdateSubTask } from './subtask/IUpdateSubTask'
 
 export interface ITask {
   id: string

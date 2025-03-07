@@ -1,7 +1,9 @@
 <script lang="ts" setup></script>
 
 <template>
-  <button class="heading-l"><slot></slot></button>
+  <button class="heading-l">
+    <span><slot></slot></span>
+  </button>
 </template>
 
 <style lang="scss" scoped>
@@ -16,6 +18,13 @@ button {
 
   &:not(:disabled):hover {
     background-color: $main-purple-hover;
+  }
+
+  span {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 23px;
+    color: white;
   }
 }
 </style>

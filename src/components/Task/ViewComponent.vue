@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watch, ref, type Ref, computed, nextTick } from 'vue'
 import PopupComponent from '../PopupComponent.vue'
-import { getTaskAsync, deleteTaskAsync } from '@/apis/kanbanapi'
+import { getTaskAsync, deleteTaskAsync, updateTaskAsync } from '@/apis/kanbanapi'
 import type { ITask } from '@/interfaces/ITask'
 import CheckBox from '../CheckBox.vue'
 import DropdownComponent from '@/components/DropdownComponent.vue'
@@ -12,33 +12,46 @@ import TransparentMask from '../TransparentMask.vue'
 import SecondaryButton from '../Button/SecondaryButton.vue'
 import DestructiveButton from '../Button/DestructiveButton.vue'
 import { debounce } from 'lodash-es'
+import FormComponent from './FormComponent.vue'
 
 const props = defineProps<{
   taskId: string
-  column: IColumn | null
+  columns: IColumn[] | undefined
 }>()
 
 const emit = defineEmits(['refresh'])
 
 const isShow = defineModel('isShow')
 
-const task: Ref<ITask | null> = ref<ITask | null>(null)
+const task: Ref<ITask | undefined> = ref<ITask | undefined>(undefined)
 
 const isShowTooltip: Ref<boolean> = ref(false)
 
 const isShowAlert: Ref<boolean> = ref(false)
 
+const isShowEdit: Ref<boolean> = ref(false)
+
 const tooltip: Ref<HTMLInputElement | undefined> = ref(undefined)
 
 const ellipsis = ref<{ element: HTMLElement } | null>(null)
 
+const column = computed((): IColumn | null => {
+  if (props.columns) {
+    const column = props.columns.filter((item) => item.id === task.value?.columnId)
+    if (column && column.length > 0) {
+      return column[0]
+    }
+  }
+  return null
+})
+
 const options = computed((): Array<IOption> => {
-  if (props.column) {
+  if (column.value) {
     return [
       {
-        id: props.column.id,
-        name: props.column.name,
-        value: props.column.id,
+        id: column.value.id,
+        name: column.value.name,
+        value: column.value.id,
       },
     ]
   }
@@ -68,6 +81,19 @@ const openAlert = () => {
   isShowTooltip.value = false
 }
 
+const hide = () => {
+  isShow.value = false
+}
+
+const openEditTask = () => {
+  isShowEdit.value = true
+  hideTooltip()
+}
+
+const refresh = async (taskId: string) => {
+  task.value = await getTaskAsync(taskId)
+}
+
 const deleteTask = debounce(async () => {
   try {
     await deleteTaskAsync(props.taskId)
@@ -79,15 +105,20 @@ const deleteTask = debounce(async () => {
   }
 }, 500)
 
-const hide = () => {
-  isShow.value = false
-}
+const editTask = debounce(async () => {
+  try {
+    const { id } = await updateTaskAsync(task.value!)
+    await refresh(id)
+  } catch (e) {
+    console.error(e)
+  }
+}, 500)
 
 watch(
   () => props.taskId,
   async (newTaskId) => {
     if (newTaskId) {
-      task.value = await getTaskAsync(newTaskId)
+      await refresh(newTaskId)
     } else {
     }
   },
@@ -112,10 +143,10 @@ watch(
           <div class="item-wrapper">
             <CheckBox
               v-for="subTask in task.subTasks"
-              :key="subTask.id"
+              :key="subTask.id!"
               :label="subTask.title"
               :is-checked="subTask.isCompleted"
-              :value="subTask.id"
+              :value="subTask.id!"
               :disable="true"
             ></CheckBox>
           </div>
@@ -133,7 +164,7 @@ watch(
     <TransparentMask v-if="isShowTooltip" @click.stop="hideTooltip">
       <div class="tooltip" ref="tooltip" @click.stop>
         <ul class="content">
-          <li><span class="body-l medium-grey">Edit Task</span></li>
+          <li @click="openEditTask"><span class="body-l medium-grey">Edit Task</span></li>
           <li @click="openAlert"><span class="body-l fire-opal">Delete Task</span></li>
         </ul>
       </div>
@@ -151,6 +182,15 @@ watch(
         </div>
       </div>
     </PopupComponent>
+    <FormComponent
+      v-model:is-show="isShowEdit"
+      v-model:task="task"
+      :columns="columns"
+      :button-function="editTask"
+    >
+      <template v-slot:title>Edit Task</template>
+      <template v-slot:button-name>Save Changes</template>
+    </FormComponent>
   </div>
 </template>
 

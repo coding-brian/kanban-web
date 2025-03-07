@@ -21,3 +21,6 @@ export const getTaskAsync = async (id: string): Promise<ITask> => await request.
 
 export const deleteTaskAsync = async (id: string): Promise<void> =>
   await request.delete(`/task/${id}`)
+
+export const updateTaskAsync = async (param: ITask): Promise<ITask> =>
+  await request.put(`/task`, param)
