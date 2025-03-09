@@ -7,7 +7,7 @@ const props = defineProps({
   isTextarea: { type: Boolean, default: false },
 })
 
-const value = defineModel('value')
+const value = defineModel<string | number | null | undefined>('value')
 
 const inputContainer = ref()
 

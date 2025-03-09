@@ -17,7 +17,7 @@ const board: Ref<ICreateBoard> = ref({
 })
 const isShow = defineModel('isShow')
 
-const remove = (index) => board.value.columns.splice(index, 1)
+const remove = (index: number) => board.value.columns.splice(index, 1)
 
 const add = () =>
   board.value.columns.push({

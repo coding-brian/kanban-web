@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, type Ref } from 'vue'
 import EllipsisImage from '@/components/Image/EllipsisImage.vue'
 import TransparentMask from '@/components/TransparentMask.vue'
 

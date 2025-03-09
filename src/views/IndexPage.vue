@@ -16,6 +16,7 @@ import type { ITask } from '@/interfaces/ITask'
 import FormComponent from '@/components/Task/FormComponent.vue'
 import EllipsisComponent from '@/components/EllipsisComponent.vue'
 import CreateBoard from '@/components/Board/CreateBoard.vue'
+import type { ISubTask } from '@/interfaces/ISubTask'
 
 const boards: Ref<Array<IBoard>> = ref([])
 
@@ -51,7 +52,7 @@ const createTask = debounce(async () => {
     taskCreation.value.boardId = board.value!.id
     await createTaskAsync(taskCreation.value)
     isShowCreateTaks.value = false
-    await refresh()
+    await refreshBoardById()
   } catch (error) {
     console.error(error)
   }
@@ -207,7 +208,7 @@ onMounted(async () => await init())
         <CardComponent v-for="task in column.tasks" :key="task.id" @click="openTask(task)">
           <template v-slot:title>{{ task.title }}</template>
           <template v-slot:completed-substasks>{{
-            task.subTasks.filter((item) => item.isCompleted).length
+            task.subTasks.filter((item) => (item as ISubTask).isCompleted).length
           }}</template>
           <template v-slot:totle-substasks>{{ task.subTasks.length }}</template>
         </CardComponent>
