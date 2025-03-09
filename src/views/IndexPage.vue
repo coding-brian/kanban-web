@@ -9,7 +9,7 @@ import HideSidebarImage from '@/components/Image/HideSidebarImage.vue'
 import { getBoardAsync, getBoardByIdAsync, createTaskAsync } from '@/apis/kanbanapi.ts'
 import { debounce } from 'lodash-es'
 import PrimaryLButton from '@/components/Button/PrimaryLButton.vue'
-import EellipsisImage from '@/components/Image/EellipsisImage.vue'
+import EllipsisImage from '@/components/Image/EllipsisImage.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import ViewComponent from '@/components/Task/ViewComponent.vue'
 import type { IColumn } from '@/interfaces/IColumn'
@@ -126,7 +126,7 @@ onMounted(async () => await init())
       >
         <span>+ Add New Task</span>
       </PrimaryLButton>
-      <EellipsisImage></EellipsisImage>
+      <EllipsisImage></EllipsisImage>
     </div>
   </header>
   <aside>

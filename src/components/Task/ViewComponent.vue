@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref, type Ref, computed, nextTick } from 'vue'
+import { watch, ref, type Ref, computed } from 'vue'
 import PopupComponent from '../PopupComponent.vue'
 import { getTaskAsync, deleteTaskAsync, updateTaskAsync } from '@/apis/kanbanapi'
 import type { ITask } from '@/interfaces/ITask'
@@ -7,13 +7,12 @@ import CheckBox from '../CheckBox.vue'
 import DropdownComponent from '@/components/DropdownComponent.vue'
 import type { IColumn } from '@/interfaces/IColumn'
 import type { IOption } from '@/interfaces/IOption'
-import EellipsisImage from '@/components/Image/EellipsisImage.vue'
-import TransparentMask from '../TransparentMask.vue'
 import SecondaryButton from '../Button/SecondaryButton.vue'
 import DestructiveButton from '../Button/DestructiveButton.vue'
 import { debounce } from 'lodash-es'
 import FormComponent from './FormComponent.vue'
 import type { ISubTask } from '@/interfaces/ISubTask'
+import EllipsisComponent from '@/components/EllipsisComponent.vue'
 
 const props = defineProps<{
   taskId: string
@@ -31,10 +30,6 @@ const isShowTooltip: Ref<boolean> = ref(false)
 const isShowAlert: Ref<boolean> = ref(false)
 
 const isShowEdit: Ref<boolean> = ref(false)
-
-const tooltip: Ref<HTMLInputElement | undefined> = ref(undefined)
-
-const ellipsis = ref<{ element: HTMLElement } | null>(null)
 
 const column = computed((): IColumn | null => {
   if (props.columns) {
@@ -59,24 +54,6 @@ const options = computed((): Array<IOption> => {
   return []
 })
 
-const openToolTip = () => {
-  isShowTooltip.value = !isShowTooltip.value
-  const ellipsisInfo = ellipsis.value?.element.getBoundingClientRect()
-  if (ellipsisInfo) {
-    nextTick(() => {
-      if (tooltip.value) {
-        tooltip.value.style.left = `${ellipsisInfo.right}px`
-        tooltip.value.style.top = `${ellipsisInfo.top}px`
-        tooltip.value.style.transform = 'translate(-50%,50%)'
-      }
-    })
-  }
-}
-
-const hideTooltip = () => {
-  isShowTooltip.value = !isShowTooltip.value
-}
-
 const openAlert = () => {
   isShowAlert.value = true
   isShowTooltip.value = false
@@ -88,7 +65,6 @@ const hide = () => {
 
 const openEditTask = () => {
   isShowEdit.value = true
-  hideTooltip()
 }
 
 const refresh = async (taskId: string) => {
@@ -133,7 +109,11 @@ watch(
       <div class="container" @click.stop>
         <div class="title-container">
           <span class="heading-l">{{ task.title }}</span>
-          <EellipsisImage @click="openToolTip" ref="ellipsis"></EellipsisImage>
+          <EllipsisComponent
+            v-model:is-show="isShowTooltip"
+            :button1="{ text: 'Edit Task', function: openEditTask }"
+            :button2="{ text: 'Delete Task', function: openAlert }"
+          ></EllipsisComponent>
         </div>
         <span class="body-l medium-grey">{{ task.description }}</span>
         <div class="subtask-container">
@@ -162,14 +142,6 @@ watch(
         </DropdownComponent>
       </div>
     </PopupComponent>
-    <TransparentMask v-if="isShowTooltip" @click.stop="hideTooltip">
-      <div class="tooltip" ref="tooltip" @click.stop>
-        <ul class="content">
-          <li @click="openEditTask"><span class="body-l medium-grey">Edit Task</span></li>
-          <li @click="openAlert"><span class="body-l fire-opal">Delete Task</span></li>
-        </ul>
-      </div>
-    </TransparentMask>
     <PopupComponent v-if="isShowAlert" @click.stop="isShowAlert = false">
       <div class="alert-container">
         <span class="fire-opal heading-l">Delete this task?</span>
@@ -219,26 +191,6 @@ watch(
       flex-direction: column;
       gap: 8px;
     }
-  }
-}
-
-.tooltip {
-  position: absolute;
-  background-color: rgba($color: #364e7e, $alpha: 0.25);
-  width: 192px;
-  height: 94px;
-
-  .content {
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-    background-color: white;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    justify-content: center;
-    padding-left: 16px;
   }
 }
 
