@@ -16,5 +16,6 @@ defineExpose({
 <style scoped lang="scss">
 img {
   cursor: pointer;
+  object-fit: contain;
 }
 </style>

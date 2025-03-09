@@ -9,12 +9,13 @@ import HideSidebarImage from '@/components/Image/HideSidebarImage.vue'
 import { getBoardAsync, getBoardByIdAsync, createTaskAsync } from '@/apis/kanbanapi.ts'
 import { debounce } from 'lodash-es'
 import PrimaryLButton from '@/components/Button/PrimaryLButton.vue'
-import EllipsisImage from '@/components/Image/EllipsisImage.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import ViewComponent from '@/components/Task/ViewComponent.vue'
 import type { IColumn } from '@/interfaces/IColumn'
 import type { ITask } from '@/interfaces/ITask'
 import FormComponent from '@/components/Task/FormComponent.vue'
+import EllipsisComponent from '@/components/EllipsisComponent.vue'
+import CreateBoard from '@/components/Board/CreateBoard.vue'
 
 const boards: Ref<Array<IBoard>> = ref([])
 
@@ -32,6 +33,10 @@ const taskCreation: Ref<ITask> = ref({
 const isShowCreateTaks: Ref<boolean> = ref(false)
 
 const isShowTask: Ref<boolean> = ref(false)
+
+const isShowTooltip: Ref<boolean> = ref(false)
+
+const isShowCreateBoard: Ref<boolean> = ref(false)
 
 const selectedTaskId: Ref<string> = ref('')
 
@@ -92,10 +97,15 @@ const init = async (): Promise<void> => {
   })
 }
 
-const refresh = async (): Promise<void> => {
+const refreshBoardById = async (): Promise<void> => {
   if (board.value) {
     board.value = await getBoardByIdAsync(board.value.id)
   }
+}
+
+const refreshAside = async () => {
+  await init()
+  isShowCreateBoard.value = false
 }
 
 const openTask = (task: ITask) => {
@@ -112,6 +122,17 @@ const openTask = (task: ITask) => {
   }
 }
 
+const buttons = [
+  {
+    text: 'Edit Board',
+    function: () => {},
+  },
+  {
+    text: 'Delete Board',
+    function: () => {},
+  },
+]
+
 onMounted(async () => await init())
 </script>
 
@@ -126,7 +147,11 @@ onMounted(async () => await init())
       >
         <span>+ Add New Task</span>
       </PrimaryLButton>
-      <EllipsisImage></EllipsisImage>
+      <EllipsisComponent
+        v-model:is-show="isShowTooltip"
+        :button1="buttons[0]"
+        :button2="buttons[1]"
+      ></EllipsisComponent>
     </div>
   </header>
   <aside>
@@ -148,7 +173,7 @@ onMounted(async () => await init())
           <img :src="board.imageSrc" alt="" srcset="" />
           <span class="item-title">{{ board.name }}</span>
         </li>
-        <li class="item">
+        <li class="item" @click="isShowCreateBoard = true">
           <img src="/icon-purple-board.svg" alt="" srcset="" />
           <span class="item-title">+ Create New Board</span>
         </li>
@@ -199,13 +224,15 @@ onMounted(async () => await init())
     :button-function="createTask"
   >
     <template v-slot:title>Add New Task</template>
+    <template v-slot:button-name>Create Task</template>
   </FormComponent>
   <ViewComponent
     v-model:is-show="isShowTask"
     :task-id="selectedTaskId"
     :columns="board?.columns"
-    @refresh="refresh"
-  ></ViewComponent>
+    @refresh="refreshBoardById"
+  />
+  <CreateBoard v-model:is-show="isShowCreateBoard" @refresh="refreshAside"></CreateBoard>
 </template>
 
 <style lang="scss" scoped>
@@ -372,10 +399,6 @@ nav {
   gap: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
-
-  img {
-    object-fit: contain;
-  }
 }
 
 .hide-sidebar {

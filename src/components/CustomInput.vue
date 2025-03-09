@@ -2,19 +2,19 @@
 import { ref } from 'vue'
 
 const props = defineProps({
-  value: { type: String, default: null },
   placeholder: { type: String, default: null },
   validate: { type: Function, default: null },
   isTextarea: { type: Boolean, default: false },
 })
-const emit = defineEmits(['update:value'])
+
+const value = defineModel('value')
 
 const inputContainer = ref()
 
 const change = (e: Event) => {
   const target = e.target as HTMLInputElement
   inputContainer.value.classList.remove('error')
-  emit('update:value', target.value)
+  value.value = target.value
 }
 
 const validate = () => {
@@ -31,7 +31,7 @@ const validate = () => {
       <template v-if="props.isTextarea">
         <textarea
           class="area"
-          :value="props.value"
+          :value="value"
           @input="change"
           :placeholder="props.placeholder"
           @blur="validate"
@@ -41,7 +41,7 @@ const validate = () => {
         <input
           class="area"
           type="text"
-          :value="props.value"
+          :value="value"
           @input="change"
           :placeholder="props.placeholder"
           @blur="validate"

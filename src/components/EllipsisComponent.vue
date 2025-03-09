@@ -25,9 +25,9 @@ const open = () => {
   if (ellipsisInfo) {
     nextTick(() => {
       if (tooltip.value) {
-        tooltip.value.style.left = `${ellipsisInfo.right}px`
+        tooltip.value.style.left = `${ellipsisInfo.left}px`
         tooltip.value.style.top = `${ellipsisInfo.top}px`
-        tooltip.value.style.transform = 'translate(-50%,50%)'
+        tooltip.value.style.transform = 'translate(-100%,50%)'
       }
     })
   }
@@ -56,6 +56,7 @@ const open = () => {
   background-color: rgba($color: #364e7e, $alpha: 0.25);
   width: 192px;
   height: 94px;
+
   .content {
     cursor: pointer;
     width: 100%;
