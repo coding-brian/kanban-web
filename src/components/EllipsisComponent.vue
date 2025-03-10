@@ -6,6 +6,7 @@ import TransparentMask from '@/components/TransparentMask.vue'
 const props = defineProps({
   button1: { type: Object, default: () => null },
   button2: { type: Object, default: () => null },
+  disabled: { type: Boolean, default: false },
 })
 
 const isShow = defineModel('isShow')
@@ -35,7 +36,7 @@ const open = () => {
 </script>
 
 <template>
-  <EllipsisImage @click.stop="open" ref="ellipsis"></EllipsisImage>
+  <EllipsisImage :disabled="props.disabled" @click.stop="open" ref="ellipsis"></EllipsisImage>
   <TransparentMask v-if="isShow" @click.stop="hideTooltip">
     <div class="tooltip" ref="tooltip" @click.stop>
       <ul class="content">

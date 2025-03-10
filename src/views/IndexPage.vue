@@ -6,7 +6,14 @@ import DarkImage from '@/components/Image/DarkImage.vue'
 import LightImage from '@/components/Image/LightImage.vue'
 import ToggleCompnent from '@/components/ToggleComponent.vue'
 import HideSidebarImage from '@/components/Image/HideSidebarImage.vue'
-import { getBoardAsync, getBoardByIdAsync, createTaskAsync } from '@/apis/kanbanapi.ts'
+import {
+  getBoardAsync,
+  getBoardByIdAsync,
+  createTaskAsync,
+  updateBoardAsync,
+  createBoardAsync,
+  deleteBoardAsync,
+} from '@/apis/kanbanapi.ts'
 import { debounce } from 'lodash-es'
 import PrimaryLButton from '@/components/Button/PrimaryLButton.vue'
 import CardComponent from '@/components/CardComponent.vue'
@@ -15,12 +22,15 @@ import type { IColumn } from '@/interfaces/IColumn'
 import type { ITask } from '@/interfaces/ITask'
 import FormComponent from '@/components/Task/FormComponent.vue'
 import EllipsisComponent from '@/components/EllipsisComponent.vue'
-import CreateBoard from '@/components/Board/CreateBoard.vue'
 import type { ISubTask } from '@/interfaces/ISubTask'
+import OperationBoard from '@/components/Board/OperationBoard.vue'
+import type { IUpdateBoard } from '@/interfaces/board/IUpdateBoard'
+import AlertComponent from '@/components/AlertComponent.vue'
+import type { ICreateBoard } from '@/interfaces/board/ICreateBoard'
 
 const boards: Ref<Array<IBoard>> = ref([])
 
-const board: Ref<IBoard | null> = ref(null)
+const board: Ref<IBoard | undefined> = ref(undefined)
 
 const taskCreation: Ref<ITask> = ref({
   id: '',
@@ -31,6 +41,12 @@ const taskCreation: Ref<ITask> = ref({
   subTasks: [],
 })
 
+const boardCreation: Ref<ICreateBoard> = ref({
+  name: '',
+  memberId: 'e198e0d3-2dd5-431c-ac74-3f3d2f4db4cb',
+  columns: [],
+})
+
 const isShowCreateTaks: Ref<boolean> = ref(false)
 
 const isShowTask: Ref<boolean> = ref(false)
@@ -39,6 +55,10 @@ const isShowTooltip: Ref<boolean> = ref(false)
 
 const isShowCreateBoard: Ref<boolean> = ref(false)
 
+const isShowEditBoard: Ref<boolean> = ref(false)
+
+const isShowAlert: Ref<boolean> = ref(false)
+
 const selectedTaskId: Ref<string> = ref('')
 
 const selectedColumn: Ref<IColumn | null> = ref(null)
@@ -46,6 +66,47 @@ const selectedColumn: Ref<IColumn | null> = ref(null)
 const hasColumns = computed(
   () => board.value && board.value.columns && board.value.columns.length > 0,
 )
+
+const boardUpdate: Ref<IUpdateBoard | undefined> = ref(undefined)
+
+const buttons = [
+  {
+    text: 'Edit Board',
+    function: () => {
+      boardUpdate.value = board.value
+      isShowEditBoard.value = true
+    },
+  },
+  {
+    text: 'Delete Board',
+    function: () => {
+      isShowAlert.value = true
+    },
+  },
+]
+
+const modifyBoardButtons = [
+  {
+    text: 'Delete',
+    function: debounce(async () => {
+      try {
+        if (board.value) await deleteBoardAsync(board.value.id)
+        await init()
+        isShowTooltip.value = false
+        isShowAlert.value = false
+      } catch (e) {
+        console.error(e)
+      }
+    }),
+  },
+  {
+    text: 'Cancel',
+    function: () => {
+      isShowTooltip.value = false
+      isShowAlert.value = false
+    },
+  },
+]
 
 const createTask = debounce(async () => {
   try {
@@ -91,6 +152,7 @@ const init = async (): Promise<void> => {
       item.imageSrc = '/icon-white-board.svg'
       item.isSelected = true
       board.value = item
+      click(board.value)
     } else {
       item.imageSrc = '/icon-board.svg'
       item.isSelected = false
@@ -123,16 +185,25 @@ const openTask = (task: ITask) => {
   }
 }
 
-const buttons = [
-  {
-    text: 'Edit Board',
-    function: () => {},
-  },
-  {
-    text: 'Delete Board',
-    function: () => {},
-  },
-]
+const createBoard = async () => {
+  try {
+    await createBoardAsync(boardCreation.value)
+    await refreshAside()
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const updateBoard = async () => {
+  try {
+    if (boardUpdate.value) {
+      await updateBoardAsync(boardUpdate.value)
+      await refreshBoardById()
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
 
 onMounted(async () => await init())
 </script>
@@ -152,6 +223,7 @@ onMounted(async () => await init())
         v-model:is-show="isShowTooltip"
         :button1="buttons[0]"
         :button2="buttons[1]"
+        :disabled="board === null || board === undefined"
       ></EllipsisComponent>
     </div>
   </header>
@@ -233,7 +305,31 @@ onMounted(async () => await init())
     :columns="board?.columns"
     @refresh="refreshBoardById"
   />
-  <CreateBoard v-model:is-show="isShowCreateBoard" @refresh="refreshAside"></CreateBoard>
+  <!-- 新增 Board -->
+  <OperationBoard
+    v-model:is-show="isShowCreateBoard"
+    v-model:board="boardCreation"
+    :function="createBoard"
+  ></OperationBoard>
+
+  <!-- 更新 Board -->
+  <OperationBoard
+    v-model:is-show="isShowEditBoard"
+    v-model:board="boardUpdate"
+    :function="updateBoard"
+  ></OperationBoard>
+
+  <AlertComponent
+    v-model:is-show="isShowAlert"
+    :button1="modifyBoardButtons[0]"
+    :button2="modifyBoardButtons[1]"
+  >
+    <template v-slot:title>Delete this board?</template>
+    <template v-slot:content
+      >Are you sure you want to delete the ‘{{ board?.name }}’ board? This action will remove all
+      columns and tasks and cannot be reversed.</template
+    >
+  </AlertComponent>
 </template>
 
 <style lang="scss" scoped>

@@ -4,41 +4,28 @@ import CustomInput from '@/components/CustomInput.vue'
 import CrossImage from '@/components/Image/CrossImage.vue'
 import SecondaryButton from '@/components/Button/SecondaryButton.vue'
 import PrimarySButton from '@/components/Button/PrimarySButton.vue'
-import { createBoardAsync } from '@/apis/kanbanapi.ts'
+import type { IUpdateBoard } from '@/interfaces/board/IUpdateBoard'
 import type { ICreateBoard } from '@/interfaces/board/ICreateBoard.ts'
-import { ref, type Ref } from 'vue'
 
-const emit = defineEmits(['refresh'])
+const props = defineProps<{ function: () => object }>()
 
-const board: Ref<ICreateBoard> = ref({
-  name: '',
-  memberId: 'e198e0d3-2dd5-431c-ac74-3f3d2f4db4cb',
-  columns: [],
-})
+const board = defineModel<IUpdateBoard | ICreateBoard>('board')
 const isShow = defineModel('isShow')
 
-const remove = (index: number) => board.value.columns.splice(index, 1)
+const remove = (index: number, board: IUpdateBoard | ICreateBoard) => board.columns.splice(index, 1)
 
-const add = () =>
-  board.value.columns.push({
+const add = (board: IUpdateBoard | ICreateBoard) =>
+  board.columns.push({
+    id: null,
     name: '',
   })
-
-const create = async () => {
-  try {
-    await createBoardAsync(board.value)
-    emit('refresh')
-  } catch (e) {
-    console.error(e)
-  }
-}
 </script>
 
 <template>
-  <PopupComponent v-if="isShow" @click="isShow = false">
+  <PopupComponent v-if="isShow && board" @click="isShow = false">
     <div class="form" @click.stop>
-      <span class="heading-l black">Add New Board</span>
-      <CustomInput v-model:value="board.name">
+      <span class="heading-l black">Edit Board</span>
+      <CustomInput v-model:value="board!.name">
         <template v-slot:title>Name</template>
       </CustomInput>
       <div class="field">
@@ -46,12 +33,12 @@ const create = async () => {
         <div class="item-container">
           <div class="item" v-for="(column, index) in board.columns" :key="index">
             <CustomInput v-model:value="column.name"></CustomInput>
-            <CrossImage @click="remove(index)"></CrossImage>
+            <CrossImage @click="remove(index, board)"></CrossImage>
           </div>
-          <SecondaryButton @click="add"> + Add New Column </SecondaryButton>
+          <SecondaryButton @click="add(board)"> + Add New Column </SecondaryButton>
         </div>
       </div>
-      <PrimarySButton @click="create"> Create New Board </PrimarySButton>
+      <PrimarySButton @click="props.function"> Save Changes </PrimarySButton>
     </div>
   </PopupComponent>
 </template>

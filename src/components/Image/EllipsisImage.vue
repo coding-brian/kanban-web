@@ -17,5 +17,9 @@ defineExpose({
 img {
   cursor: pointer;
   object-fit: contain;
+
+  &[disabled='true'] {
+    pointer-events: none;
+  }
 }
 </style>

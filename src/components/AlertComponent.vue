@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import PopupComponent from '@/components/PopupComponent.vue'
+import SecondaryButton from '@/components/Button/SecondaryButton.vue'
+import DestructiveButton from '@/components/Button/DestructiveButton.vue'
 
 const props = defineProps({
   button1: { type: Object, defauult: () => {} },
