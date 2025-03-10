@@ -73,6 +73,7 @@ const buttons = [
   {
     text: 'Edit Board',
     function: () => {
+      isShowTooltip.value = false
       boardUpdate.value = board.value
       isShowEditBoard.value = true
     },
@@ -80,6 +81,7 @@ const buttons = [
   {
     text: 'Delete Board',
     function: () => {
+      isShowTooltip.value = false
       isShowAlert.value = true
     },
   },
@@ -92,7 +94,6 @@ const modifyBoardButtons = [
       try {
         if (board.value) await deleteBoardAsync(board.value.id)
         await init()
-        isShowTooltip.value = false
         isShowAlert.value = false
       } catch (e) {
         console.error(e)
@@ -102,7 +103,6 @@ const modifyBoardButtons = [
   {
     text: 'Cancel',
     function: () => {
-      isShowTooltip.value = false
       isShowAlert.value = false
     },
   },

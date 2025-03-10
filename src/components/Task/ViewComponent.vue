@@ -7,12 +7,11 @@ import CheckBox from '../CheckBox.vue'
 import DropdownComponent from '@/components/DropdownComponent.vue'
 import type { IColumn } from '@/interfaces/IColumn'
 import type { IOption } from '@/interfaces/IOption'
-import SecondaryButton from '../Button/SecondaryButton.vue'
-import DestructiveButton from '../Button/DestructiveButton.vue'
 import { debounce } from 'lodash-es'
 import FormComponent from './FormComponent.vue'
 import type { ISubTask } from '@/interfaces/ISubTask'
 import EllipsisComponent from '@/components/EllipsisComponent.vue'
+import AlertComponent from '../AlertComponent.vue'
 
 const props = defineProps<{
   taskId: string
@@ -142,19 +141,25 @@ watch(
         </DropdownComponent>
       </div>
     </PopupComponent>
-    <PopupComponent v-if="isShowAlert" @click.stop="isShowAlert = false">
-      <div class="alert-container">
-        <span class="fire-opal heading-l">Delete this task?</span>
-        <span class="body-l medium-grey"
-          >Are you sure you want to delete the {{ task?.title }} task? This action will remove all
-          subtasks and cannot be reversed.</span
-        >
-        <div class="button-group">
-          <DestructiveButton @click="deleteTask"> Delete </DestructiveButton>
-          <SecondaryButton @click="isShowAlert = false"> Cancel </SecondaryButton>
-        </div>
-      </div>
-    </PopupComponent>
+    <AlertComponent
+      v-model:is-show="isShowAlert"
+      :button1="{
+        text: 'Delete',
+        function: deleteTask,
+      }"
+      :button2="{
+        text: 'Cancel',
+        function: () => {
+          isShowAlert = false
+        },
+      }"
+    >
+      <template v-slot:title>Delete this task?</template>
+      <template v-slot:content
+        >Are you sure you want to delete the {{ task?.title }} task? This action will remove all
+        subtasks and cannot be reversed.</template
+      >
+    </AlertComponent>
     <FormComponent
       v-model:is-show="isShowEdit"
       v-model:task="task"
@@ -200,22 +205,5 @@ watch(
   top: 0;
   width: 100%;
   height: 100%;
-}
-
-.alert-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 32px;
-  width: 480px;
-}
-
-.button-group {
-  display: flex;
-  gap: 16px;
-
-  & > button {
-    flex-grow: 1;
-  }
 }
 </style>
