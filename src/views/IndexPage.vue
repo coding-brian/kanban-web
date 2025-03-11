@@ -27,6 +27,7 @@ import OperationBoard from '@/components/Board/OperationBoard.vue'
 import type { IUpdateBoard } from '@/interfaces/board/IUpdateBoard'
 import AlertComponent from '@/components/AlertComponent.vue'
 import type { ICreateBoard } from '@/interfaces/board/ICreateBoard'
+import ShowSidebarImage from '@/components/Image/ShowSidebarImage.vue'
 
 const boards: Ref<Array<IBoard>> = ref([])
 
@@ -58,6 +59,7 @@ const isShowCreateBoard: Ref<boolean> = ref(false)
 const isShowEditBoard: Ref<boolean> = ref(false)
 
 const isShowAlert: Ref<boolean> = ref(false)
+const isShowSidebar: Ref<boolean> = ref(true)
 
 const selectedTaskId: Ref<string> = ref('')
 
@@ -210,26 +212,31 @@ onMounted(async () => await init())
 
 <template>
   <header>
-    <span class="heading-xl">{{ board?.name }}</span>
-    <div>
-      <PrimaryLButton
-        :class="{ 'opacity-25': hasColumns ? false : true }"
-        :disabled="hasColumns ? false : true"
-        @click="isShowCreateTaks = true"
-      >
-        <span>+ Add New Task</span>
-      </PrimaryLButton>
-      <EllipsisComponent
-        v-model:is-show="isShowTooltip"
-        :button1="buttons[0]"
-        :button2="buttons[1]"
-        :disabled="board === null || board === undefined"
-      ></EllipsisComponent>
-    </div>
-  </header>
-  <aside>
     <div class="logo">
       <LogoImage />
+    </div>
+    <div class="header-container">
+      <span class="heading-xl">{{ board?.name }}</span>
+      <div>
+        <PrimaryLButton
+          :class="{ 'opacity-25': hasColumns ? false : true }"
+          :disabled="hasColumns ? false : true"
+          @click="isShowCreateTaks = true"
+        >
+          <span>+ Add New Task</span>
+        </PrimaryLButton>
+        <EllipsisComponent
+          v-model:is-show="isShowTooltip"
+          :button1="buttons[0]"
+          :button2="buttons[1]"
+          :disabled="board === null || board === undefined"
+        ></EllipsisComponent>
+      </div>
+    </div>
+  </header>
+  <aside :class="{ hide: isShowSidebar === false }">
+    <div class="show-sidebar" @click="isShowSidebar = true">
+      <ShowSidebarImage />
     </div>
     <nav>
       <span class="nav-title">ALL BOARDS ({{ boards.length }})</span>
@@ -258,7 +265,7 @@ onMounted(async () => await init())
         <ToggleCompnent />
         <DarkImage />
       </div>
-      <div class="hide-sidebar">
+      <div class="hide-sidebar" @click="isShowSidebar = false">
         <HideSidebarImage />
         <span>Hide Sidebar</span>
       </div>
@@ -334,30 +341,44 @@ onMounted(async () => await init())
 
 <style lang="scss" scoped>
 header {
-  border: 1px $light-lines solid;
   grid-area: header;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 24px;
-  padding-right: 24px;
+
+  .logo {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    width: 300px;
+    border-right: 1px $light-lines solid;
+    padding-left: 32px;
+  }
+
+  .header-container {
+    flex-grow: 1;
+    border: 1px $light-lines solid;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 24px;
+    padding-right: 32px;
+
+    & > div {
+      display: flex;
+      gap: 24px;
+
+      & > img {
+        object-fit: contain;
+      }
+    }
+  }
 
   & > span {
     cursor: default;
   }
-
-  & > div {
-    display: flex;
-    gap: 24px;
-
-    & > img {
-      object-fit: contain;
-    }
-  }
 }
 
 aside {
-  border: 1px $light-lines solid;
+  border-right: 1px $light-lines solid;
   grid-area: aside;
   display: flex;
   flex-direction: column;
@@ -370,6 +391,33 @@ aside {
     display: flex;
     flex-direction: column;
     gap: 24px;
+  }
+
+  &.hide {
+    display: block;
+    position: fixed;
+    padding: 0;
+    bottom: 32px;
+    left: 0;
+
+    nav,
+    .aside-footer {
+      display: none;
+    }
+
+    .show-sidebar {
+      cursor: pointer;
+      position: fixed;
+      bottom: 32px;
+      background-color: $main-purple;
+      border-top-right-radius: 100%;
+      border-bottom-right-radius: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 56px;
+      height: 48px;
+    }
   }
 }
 
@@ -424,13 +472,6 @@ main {
   & > * {
     flex-shrink: 0;
   }
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  margin-bottom: 54px;
-  margin-left: 32px;
 }
 
 nav {
@@ -499,6 +540,7 @@ nav {
 }
 
 .hide-sidebar {
+  cursor: pointer;
   display: flex;
   gap: 8px;
 

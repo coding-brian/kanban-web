@@ -23,7 +23,13 @@ li {
   grid-template-columns: 300px auto;
   grid-template-rows: 97px auto;
   grid-template-areas:
-    'aside header'
+    'header header'
     'aside main';
   align-items: stretch;
+
+  &:has(aside.hide) {
+    grid-template-areas:
+      'header header'
+      'main main';
+  }
 }
