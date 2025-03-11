@@ -4,6 +4,7 @@ import { type IBoard } from '@/interfaces/IBoard'
 import type { ITask } from '@/interfaces/ITask.ts'
 import type { IUpdateBoard } from '@/interfaces/board/IUpdateBoard.ts'
 import type { ICreateBoard } from '@/interfaces/board/ICreateBoard.ts'
+import type { ICreateColumn } from '@/interfaces/column/ICreateColumn.ts'
 
 const request = createAxiosInstance({ baseURL: import.meta.env.VITE_APP_API_URL })
 
@@ -19,6 +20,11 @@ export const updateBoardAsync = async (param: IUpdateBoard) => await request.put
 export const createBoardAsync = async (param: ICreateBoard) => await request.post('/board', param)
 
 export const deleteBoardAsync = async (id: string) => await request.delete(`/board/${id}`)
+
+/** Column */
+
+export const createColumnAsync = async (params: ICreateColumn[]) =>
+  await request.post('column', params)
 
 /** Task */
 

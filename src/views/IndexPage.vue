@@ -13,6 +13,7 @@ import {
   updateBoardAsync,
   createBoardAsync,
   deleteBoardAsync,
+  createColumnAsync,
 } from '@/apis/kanbanapi.ts'
 import { debounce } from 'lodash-es'
 import PrimaryLButton from '@/components/Button/PrimaryLButton.vue'
@@ -28,6 +29,8 @@ import type { IUpdateBoard } from '@/interfaces/board/IUpdateBoard'
 import AlertComponent from '@/components/AlertComponent.vue'
 import type { ICreateBoard } from '@/interfaces/board/ICreateBoard'
 import ShowSidebarImage from '@/components/Image/ShowSidebarImage.vue'
+import type { ICreateColumn } from '@/interfaces/column/ICreateColumn'
+import CreateColumn from '@/components/CreateColumn.vue'
 
 const boards: Ref<Array<IBoard>> = ref([])
 
@@ -48,6 +51,8 @@ const boardCreation: Ref<ICreateBoard> = ref({
   columns: [],
 })
 
+const columnCreations: Ref<ICreateColumn[]> = ref([])
+
 const isShowCreateTaks: Ref<boolean> = ref(false)
 
 const isShowTask: Ref<boolean> = ref(false)
@@ -59,7 +64,10 @@ const isShowCreateBoard: Ref<boolean> = ref(false)
 const isShowEditBoard: Ref<boolean> = ref(false)
 
 const isShowAlert: Ref<boolean> = ref(false)
+
 const isShowSidebar: Ref<boolean> = ref(true)
+
+const isShowCreateColumn: Ref<boolean> = ref(false)
 
 const selectedTaskId: Ref<string> = ref('')
 
@@ -207,6 +215,14 @@ const updateBoard = async () => {
   }
 }
 
+const createColumn = async () => {
+  try {
+    await createColumnAsync(columnCreations.value)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 onMounted(async () => await init())
 </script>
 
@@ -275,7 +291,7 @@ onMounted(async () => await init())
     <template v-if="!hasColumns">
       <div class="empty-container">
         <span class="heading-l">This board is empty. Create a new column to get started.</span>
-        <PrimaryLButton>
+        <PrimaryLButton @click="isShowCreateColumn = true">
           <span>+ Add New Column</span>
         </PrimaryLButton>
       </div>
@@ -292,7 +308,7 @@ onMounted(async () => await init())
           <template v-slot:totle-substasks>{{ task.subTasks.length }}</template>
         </CardComponent>
       </div>
-      <div class="add-new-column">
+      <div class="add-new-column" @click="isShowCreateColumn = true">
         <span class="heading-xl">+ New Column</span>
       </div>
     </template>
@@ -337,6 +353,14 @@ onMounted(async () => await init())
       columns and tasks and cannot be reversed.</template
     >
   </AlertComponent>
+
+  <CreateColumn
+    v-if="board"
+    v-model:is-show="isShowCreateColumn"
+    v-model:columns="columnCreations"
+    :function="createColumn"
+    :board-id="board!.id"
+  ></CreateColumn>
 </template>
 
 <style lang="scss" scoped>

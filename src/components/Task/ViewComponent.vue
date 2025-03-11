@@ -54,8 +54,8 @@ const options = computed((): Array<IOption> => {
 })
 
 const openAlert = () => {
-  isShowAlert.value = true
   isShowTooltip.value = false
+  isShowAlert.value = true
 }
 
 const hide = () => {
@@ -63,6 +63,7 @@ const hide = () => {
 }
 
 const openEditTask = () => {
+  isShowTooltip.value = false
   isShowEdit.value = true
 }
 
@@ -74,7 +75,7 @@ const deleteTask = debounce(async () => {
   try {
     await deleteTaskAsync(props.taskId)
     isShowAlert.value = false
-    isShow.value = false
+    hide()
     emit('refresh')
   } catch (e) {
     console.error(e)
