@@ -195,33 +195,34 @@ const openTask = (task: ITask) => {
   }
 }
 
-const createBoard = async () => {
+const createBoard = debounce(async () => {
   try {
     await createBoardAsync(boardCreation.value)
     await refreshAside()
   } catch (e) {
     console.error(e)
   }
-}
+}, 500)
 
-const updateBoard = async () => {
+const updateBoard = debounce(async () => {
   try {
     if (boardUpdate.value) {
       await updateBoardAsync(boardUpdate.value)
       await refreshBoardById()
+      isShowEditBoard.value = false
     }
   } catch (e) {
     console.error(e)
   }
-}
+}, 500)
 
-const createColumn = async () => {
+const createColumn = debounce(async () => {
   try {
     await createColumnAsync(columnCreations.value)
   } catch (e) {
     console.log(e)
   }
-}
+}, 500)
 
 onMounted(async () => await init())
 </script>
