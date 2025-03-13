@@ -43,6 +43,7 @@ const taskCreation: Ref<ITask> = ref({
   columnId: '',
   title: '',
   description: '',
+  priority: 0,
   subTasks: [],
 })
 
@@ -230,24 +231,10 @@ const cancelDefaul = (event: Event) => {
   event.stopPropagation()
 }
 
-const dragEnter = (event: DragEvent) => {
-  // console.log('dragEnter ', event.target)
-}
+const dragOver = (event: DragEvent) => cancelDefaul(event)
 
-const dragOver = (event: DragEvent) => {
-  console.log('dragOver')
-
-  cancelDefaul(event)
-}
-
-const drag = (event: DragEvent, taskId: string, columnId: string) => {
-  console.log('start,', taskId)
+const drag = (event: DragEvent, taskId: string, columnId: string) =>
   event.dataTransfer!.setData('application/json', JSON.stringify({ taskId, columnId }))
-}
-
-const dragEnd = (event: DragEvent) => {
-  cancelDefaul(event)
-}
 
 const drop = (event: DragEvent) => {
   console.log('drop ', event)
@@ -382,7 +369,6 @@ onMounted(async () => await init())
           @click="openTask(task)"
           draggable="true"
           @dragstart="drag($event, task.id, column.id)"
-          @dragenter="dragEnter"
           @dragover="dragOverTask"
           @drop="dropTask($event, task.id, column.id)"
         >
