@@ -7,5 +7,6 @@ export interface ITask {
   boardId: string
   title: string
   description: string
+  priority: number
   subTasks: ISubTask[] | IUpdateSubTask[]
 }

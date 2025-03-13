@@ -4,8 +4,8 @@
   <div class="card">
     <span class="title"><slot name="title">456</slot></span>
     <span class="sub-title"
-      ><slot name="completed-substasks"></slot> of
-      <slot name="totle-substasks"></slot> substasks</span
+      ><slot name="completed-substasks"></slot> of<slot name="totle-substasks"></slot>
+      substasks</span
     >
   </div>
 </template>

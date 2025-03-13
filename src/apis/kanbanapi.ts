@@ -5,6 +5,7 @@ import type { ITask } from '@/interfaces/ITask.ts'
 import type { IUpdateBoard } from '@/interfaces/board/IUpdateBoard.ts'
 import type { ICreateBoard } from '@/interfaces/board/ICreateBoard.ts'
 import type { ICreateColumn } from '@/interfaces/column/ICreateColumn.ts'
+import type { IUpdateColumnTaskPriority } from '@/interfaces/column/IUpdateColumnTaskPriority.ts'
 
 const request = createAxiosInstance({ baseURL: import.meta.env.VITE_APP_API_URL })
 
@@ -17,14 +18,18 @@ export const getBoardByIdAsync = async (id: string): Promise<IBoard> =>
 
 export const updateBoardAsync = async (param: IUpdateBoard) => await request.put('/board', param)
 
+export const updateBoardColumsAsync = async (id: string, params: ICreateColumn[]) =>
+  await request.put(`/board/${id}/columns`, params)
+
 export const createBoardAsync = async (param: ICreateBoard) => await request.post('/board', param)
 
 export const deleteBoardAsync = async (id: string) => await request.delete(`/board/${id}`)
 
 /** Column */
-
-export const createColumnAsync = async (params: ICreateColumn[]) =>
-  await request.post('column', params)
+export const updateColumnTaskPriorityAsync = async (
+  id: string,
+  params: IUpdateColumnTaskPriority[],
+) => await request.put(`/column/${id}/tasks`, params)
 
 /** Task */
 

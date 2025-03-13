@@ -13,7 +13,8 @@ import {
   updateBoardAsync,
   createBoardAsync,
   deleteBoardAsync,
-  createColumnAsync,
+  updateBoardColumsAsync,
+  updateColumnTaskPriorityAsync,
 } from '@/apis/kanbanapi.ts'
 import { debounce } from 'lodash-es'
 import PrimaryLButton from '@/components/Button/PrimaryLButton.vue'
@@ -218,11 +219,79 @@ const updateBoard = debounce(async () => {
 
 const createColumn = debounce(async () => {
   try {
-    await createColumnAsync(columnCreations.value)
+    if (board.value) await updateBoardColumsAsync(board.value?.id, columnCreations.value)
   } catch (e) {
     console.log(e)
   }
 }, 500)
+
+const cancelDefaul = (event: Event) => {
+  event.preventDefault()
+  event.stopPropagation()
+}
+
+const dragEnter = (event: DragEvent) => {
+  // console.log('dragEnter ', event.target)
+}
+
+const dragOver = (event: DragEvent) => {
+  console.log('dragOver')
+
+  cancelDefaul(event)
+}
+
+const drag = (event: DragEvent, taskId: string, columnId: string) => {
+  console.log('start,', taskId)
+  event.dataTransfer!.setData('application/json', JSON.stringify({ taskId, columnId }))
+}
+
+const dragEnd = (event: DragEvent) => {
+  cancelDefaul(event)
+}
+
+const drop = (event: DragEvent) => {
+  console.log('drop ', event)
+  cancelDefaul(event)
+}
+
+const dropTask = async (event: DragEvent, taskId: string, columnId: string): Promise<boolean> => {
+  const source = JSON.parse(event.dataTransfer!.getData('application/json'))
+
+  if (board.value) {
+    const sourceColumn = board.value.columns.filter((item) => item.id === source.columnId)[0]
+    const sourceTask = sourceColumn.tasks.filter((item) => item.id === source.taskId)[0]
+    const sourceIndex = sourceColumn.tasks.findIndex((item) => item.id === source.taskId)
+
+    const column = board.value.columns.filter((item) => item.id === columnId)[0]
+    const index = column.tasks.findIndex((item) => item.id === taskId)
+
+    if (sourceColumn.id === column.id && index === sourceIndex) {
+      return true
+    }
+
+    if (sourceColumn.id === column.id && index !== sourceIndex) {
+      column.tasks.splice(index > sourceIndex ? index + 1 : index, 0, sourceTask)
+      sourceColumn.tasks.splice(index > sourceIndex ? sourceIndex : sourceIndex + 1, 1)
+    }
+
+    if (sourceColumn.id !== column.id) {
+      column.tasks.splice(index, 0, sourceTask)
+      sourceColumn.tasks.splice(sourceIndex, 1)
+    }
+
+    column.tasks.forEach((task, index) => (task.priority = index))
+
+    await updateColumnTaskPriorityAsync(columnId, column.tasks)
+  }
+
+  cancelDefaul(event)
+
+  return true
+}
+
+const dragOverTask = (event: DragEvent) => {
+  cancelDefaul(event)
+}
 
 onMounted(async () => await init())
 </script>
@@ -299,9 +368,24 @@ onMounted(async () => await init())
     </template>
 
     <template v-if="hasColumns">
-      <div class="column" v-for="column in board?.columns" :key="column.id">
+      <div
+        class="column"
+        v-for="column in board?.columns"
+        :key="column.id"
+        @drop="drop"
+        @dragover="dragOver"
+      >
         <span class="heading-s">{{ column.name }} ({{ column.tasks.length }})</span>
-        <CardComponent v-for="task in column.tasks" :key="task.id" @click="openTask(task)">
+        <CardComponent
+          v-for="task in column.tasks"
+          :key="task.id"
+          @click="openTask(task)"
+          draggable="true"
+          @dragstart="drag($event, task.id, column.id)"
+          @dragenter="dragEnter"
+          @dragover="dragOverTask"
+          @drop="dropTask($event, task.id, column.id)"
+        >
           <template v-slot:title>{{ task.title }}</template>
           <template v-slot:completed-substasks>{{
             task.subTasks.filter((item) => (item as ISubTask).isCompleted).length
