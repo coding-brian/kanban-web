@@ -54,7 +54,7 @@ watch(
 
 <template>
   <div class="dropdown-container" @blur="blur" tabindex="0" :class="{ disable: props.disabled }">
-    <span class="body-m medium-grey"><slot name="title"></slot></span>
+    <span class="title"><slot name="title"></slot></span>
     <div>
       <div class="select" @click="changeSelectStyle" ref="selectElement">
         <span>{{ chooseName }}</span>
@@ -79,6 +79,11 @@ watch(
 
 <style lang="scss" scoped>
 .dropdown-container {
+  .title {
+    @extend %body-m;
+    color: $medium-grey;
+  }
+
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -93,8 +98,6 @@ watch(
 
   .select {
     @extend %body-l;
-
-    appearance: none;
     border: 1px solid;
     border-color: rgba($color: $medium-grey, $alpha: 0.25);
     border-radius: 4px;
@@ -143,6 +146,31 @@ watch(
         &:hover {
           background-color: $main-purple-hover;
         }
+      }
+    }
+  }
+}
+
+.dark {
+  .dropdown-container {
+    color: white;
+
+    .select {
+      color: white;
+      background-color: rgba($color: $dark-grey, $alpha: 1);
+    }
+
+    .title {
+      color: white;
+    }
+
+    .option-group {
+      background-color: rgba($color: $very-dark-grey, $alpha: 1);
+      border-radius: 8px;
+
+      ul {
+        color: $medium-grey;
+        background-color: rgba($color: $very-dark-grey, $alpha: 1);
       }
     }
   }

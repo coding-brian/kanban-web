@@ -1,6 +1,18 @@
+<script setup lang="ts">
+import { useDark, useToggle } from '@vueuse/core'
+
+const isDark = useDark()
+const toggleIsDark = useToggle(isDark)
+const toggle = async () => {
+  setTimeout(() => {
+    toggleIsDark()
+  }, 400)
+}
+</script>
+
 <template>
   <label class="toggle">
-    <input type="checkbox" />
+    <input type="checkbox" @click="toggle" />
     <span class="slider"></span>
   </label>
 </template>
@@ -29,7 +41,6 @@
   border-radius: 50px; /* 完全圓角 */
   width: 100%;
   height: 100%;
-  transition: 0.4s; /* 平滑效果 */
 }
 
 /* 滑塊設置 */
@@ -47,7 +58,7 @@
 }
 
 /* 當 checkbox 被勾選時，滑塊移動 */
-.toggle input:checked + .slider::before {
+.toggle input[type='checkbox']:checked + .slider::before {
   left: calc(100% - 19px); /*滑動到右邊 */
 }
 </style>

@@ -23,4 +23,14 @@ button {
     color: $main-purple;
   }
 }
+
+.dark {
+  button {
+    background-color: white;
+
+    &:not(:disabled):hover {
+      background-color: white;
+    }
+  }
+}
 </style>

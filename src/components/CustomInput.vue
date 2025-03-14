@@ -114,4 +114,26 @@ const validate = () => {
     color: $fire-opal;
   }
 }
+
+.dark {
+  .container {
+    color: black;
+
+    .area,
+    input,
+    .title {
+      color: white;
+    }
+
+    .area,
+    input {
+      background-color: $dark-grey;
+      border: 1px rgba($color: $medium-grey, $alpha: 0.25) solid;
+    }
+
+    &::placeholder {
+      color: rgba($color: white, $alpha: 0.25);
+    }
+  }
+}
 </style>

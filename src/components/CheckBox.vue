@@ -103,4 +103,30 @@ const change = (e: Event) => {
     margin-left: 16px;
   }
 }
+
+.dark {
+  .input-container {
+    background-color: $very-dark-grey;
+
+    input {
+      background-color: $dark-grey;
+      border: 1px rgba($color: $main-purple, $alpha: 0.24) solid;
+
+      &:checked {
+        background-color: $main-purple;
+
+        &::after {
+          content: '';
+          background-image: url('@/assets/images/icon-check.svg');
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+      }
+    }
+
+    label {
+      color: white;
+    }
+  }
+}
 </style>
