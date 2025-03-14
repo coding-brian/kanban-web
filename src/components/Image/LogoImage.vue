@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import Logo from '@/assets/images/logo-dark.svg'
+import DarkLogo from '@/assets/images/logo-dark.svg'
+import LightLogo from '@/assets/images/logo-light.svg'
+import { useDark } from '@vueuse/core'
+
+const isDark = useDark()
 </script>
 
 <template>
-  <img :src="Logo" alt="" srcset="" />
+  <img :src="isDark ? LightLogo : DarkLogo" alt="" srcset="" />
 </template>

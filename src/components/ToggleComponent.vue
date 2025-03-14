@@ -12,7 +12,7 @@ const toggle = async () => {
 
 <template>
   <label class="toggle">
-    <input type="checkbox" @click="toggle" />
+    <input type="checkbox" :value="isDark" @click="toggle" />
     <span class="slider"></span>
   </label>
 </template>

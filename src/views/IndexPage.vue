@@ -308,7 +308,7 @@ onMounted(async () => await init())
     </div>
   </header>
   <aside :class="{ hide: isShowSidebar === false }">
-    <div class="show-sidebar" @click="isShowSidebar = true">
+    <div class="show-sidebar" v-if="!isShowSidebar" @click="isShowSidebar = true">
       <ShowSidebarImage />
     </div>
     <nav>
@@ -642,6 +642,56 @@ nav {
   span {
     @extend %heading-m;
     color: $medium-grey;
+  }
+}
+
+.dark {
+  header {
+    background-color: $dark-grey;
+
+    .logo {
+      border-right: 1px $dark-lines solid;
+    }
+
+    .header-container {
+      border: 1px $dark-lines solid;
+
+      & > span {
+        color: white;
+      }
+    }
+  }
+
+  aside {
+    border-right: 1px $dark-lines solid;
+    background-color: $dark-grey;
+  }
+
+  main {
+    background-color: $very-dark-grey;
+    border: 1px $dark-lines solid;
+
+    .add-new-column {
+      background: linear-gradient(
+        to bottom,
+        rgba($color: #2b2c37, $alpha: 1),
+        rgba($color: #2b2c37, $alpha: 0.5)
+      );
+    }
+  }
+
+  nav {
+    li {
+      &.item:last-child {
+        .item-title {
+          color: $main-purple;
+        }
+      }
+    }
+  }
+
+  .mode-toggle {
+    background-color: $very-dark-grey;
   }
 }
 </style>
