@@ -47,15 +47,9 @@ const taskCreation: Ref<ITask> = ref({
   subTasks: [],
 })
 
-const boardCreation: Ref<ICreateBoard> = ref({
-  name: '',
-  memberId: 'e198e0d3-2dd5-431c-ac74-3f3d2f4db4cb',
-  columns: [],
-})
-
 const columnCreations: Ref<ICreateColumn[]> = ref([])
 
-const isShowCreateTaks: Ref<boolean> = ref(false)
+const isShowCreateTask: Ref<boolean> = ref(false)
 
 const isShowTask: Ref<boolean> = ref(false)
 
@@ -79,14 +73,14 @@ const hasColumns = computed(
   () => board.value && board.value.columns && board.value.columns.length > 0,
 )
 
-const boardUpdate: Ref<IUpdateBoard | undefined> = ref(undefined)
+const modifiedBoard: Ref<IUpdateBoard | ICreateBoard | undefined> = ref(undefined)
 
 const buttons = [
   {
     text: 'Edit Board',
-    function: () => {
+    function: async () => {
       isShowTooltip.value = false
-      boardUpdate.value = board.value
+      modifiedBoard.value = JSON.parse(JSON.stringify(board.value))
       isShowEditBoard.value = true
     },
   },
@@ -124,7 +118,7 @@ const createTask = debounce(async () => {
   try {
     taskCreation.value.boardId = board.value!.id
     await createTaskAsync(taskCreation.value)
-    isShowCreateTaks.value = false
+    isShowCreateTask.value = false
     await refreshBoardById()
   } catch (error) {
     console.error(error)
@@ -199,7 +193,7 @@ const openTask = (task: ITask) => {
 
 const createBoard = debounce(async () => {
   try {
-    await createBoardAsync(boardCreation.value)
+    await createBoardAsync(modifiedBoard.value as ICreateBoard)
     await refreshAside()
   } catch (e) {
     console.error(e)
@@ -208,9 +202,9 @@ const createBoard = debounce(async () => {
 
 const updateBoard = debounce(async () => {
   try {
-    if (boardUpdate.value) {
-      await updateBoardAsync(boardUpdate.value)
-      await refreshBoardById()
+    if (modifiedBoard.value) {
+      await updateBoardAsync(modifiedBoard.value as IUpdateBoard)
+      await init()
       isShowEditBoard.value = false
     }
   } catch (e) {
@@ -225,6 +219,15 @@ const createColumn = debounce(async () => {
     console.log(e)
   }
 }, 500)
+
+const showBoardCreation = () => {
+  modifiedBoard.value = {
+    name: '',
+    memberId: 'e198e0d3-2dd5-431c-ac74-3f3d2f4db4cb',
+    columns: [],
+  }
+  isShowCreateBoard.value = true
+}
 
 const cancelDefaul = (event: Event) => {
   event.preventDefault()
@@ -294,7 +297,7 @@ onMounted(async () => await init())
         <PrimaryLButton
           :class="{ 'opacity-25': hasColumns ? false : true }"
           :disabled="hasColumns ? false : true"
-          @click="isShowCreateTaks = true"
+          @click="isShowCreateTask = true"
         >
           <span>+ Add New Task</span>
         </PrimaryLButton>
@@ -326,7 +329,7 @@ onMounted(async () => await init())
           <img :src="board.imageSrc" alt="" srcset="" />
           <span class="item-title">{{ board.name }}</span>
         </li>
-        <li class="item" @click="isShowCreateBoard = true">
+        <li class="item" @click="showBoardCreation">
           <img src="/icon-purple-board.svg" alt="" srcset="" />
           <span class="item-title">+ Create New Board</span>
         </li>
@@ -385,7 +388,7 @@ onMounted(async () => await init())
     </template>
   </main>
   <FormComponent
-    v-model:is-show="isShowCreateTaks"
+    v-model:is-show="isShowCreateTask"
     v-model:task="taskCreation"
     :columns="board?.columns"
     :button-function="createTask"
@@ -402,14 +405,14 @@ onMounted(async () => await init())
   <!-- 新增 Board -->
   <OperationBoard
     v-model:is-show="isShowCreateBoard"
-    v-model:board="boardCreation"
+    v-model:board="modifiedBoard"
     :function="createBoard"
   ></OperationBoard>
 
   <!-- 更新 Board -->
   <OperationBoard
     v-model:is-show="isShowEditBoard"
-    v-model:board="boardUpdate"
+    v-model:board="modifiedBoard"
     :function="updateBoard"
   ></OperationBoard>
 
@@ -629,7 +632,7 @@ nav {
   background-color: $light-grey;
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 24px;
   padding-top: 16px;
   padding-bottom: 16px;
 }
