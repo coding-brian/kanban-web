@@ -214,7 +214,11 @@ const updateBoard = debounce(async () => {
 
 const createColumn = debounce(async () => {
   try {
-    if (board.value) await updateBoardColumsAsync(board.value?.id, columnCreations.value)
+    if (board.value && columnCreations.value.length > 0) {
+      await updateBoardColumsAsync(board.value?.id, columnCreations.value)
+      await refreshBoardById()
+      isShowCreateColumn.value = false
+    }
   } catch (e) {
     console.log(e)
   }

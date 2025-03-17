@@ -11,6 +11,17 @@
 </template>
 
 <style lang="scss" scoped>
+.dark {
+  .card {
+    box-shadow: 0px 4px 6px rgba(#364e7e, 0.1);
+    background-color: $dark-grey;
+
+    .title {
+      color: white;
+    }
+  }
+}
+
 .card {
   width: 280px;
   border-radius: 8px;
